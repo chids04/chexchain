@@ -39,4 +39,4 @@ namespace BlockchainAssignment::HashCode {
         return ByteArrayToString(combinedHash);
     }
 
-}  // namespace BlockchainAssignment::HashCode
+}  

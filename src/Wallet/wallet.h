@@ -28,6 +28,6 @@ namespace BlockchainAssignment::Wallet {
         static std::vector<unsigned char> Base64Decode(const std::string& encoded);
     };
 
-} // namespace BlockchainAssignment::Wallet
+} 
 
 #endif // WALLET_H

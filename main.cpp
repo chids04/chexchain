@@ -4,6 +4,7 @@
 #include <qDebug>
 
 #include "wallet.h"
+#include "blockchainapp.h"
 
 int main(int argc, char *argv[])
 {
@@ -27,6 +28,8 @@ int main(int argc, char *argv[])
     bool isValid = BlockchainAssignment::Wallet::Wallet::ValidateSignature(myWallet.publicID, hash, signature);
     std::cout << "Signature Valid: " << (isValid ? "YES" : "NO") << "\n";
 
+    auto b_app = engine.singletonInstance<BlockchainApp*>("blockchain", "BlockchainApp");
+    b_app->init();
 
     return app.exec();
 }
