@@ -1,0 +1,5 @@
+--resource
+/Users/chids/Documents/uni/cs3bc/blockchain/build/.qt/rcc/qmake_blockchain.qrc
+--resource
+/Users/chids/Documents/uni/cs3bc/blockchain/build/.qt/rcc/appblockchain_raw_qml_0.qrc
+/qt/qml/blockchain/Main.qml

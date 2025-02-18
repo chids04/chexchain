@@ -1,0 +1,12 @@
+--bare
+-I
+/Users/chids/Documents/uni/cs3bc/blockchain/build
+-I
+/Users/chids/Qt/6.8.0/macos/qml
+--resource
+/Users/chids/Documents/uni/cs3bc/blockchain/build/.qt/rcc/qmake_blockchain.qrc
+--resource
+/Users/chids/Documents/uni/cs3bc/blockchain/build/.qt/rcc/appblockchain_raw_qml_0.qrc
+/Users/chids/Documents/uni/cs3bc/blockchain/Main.qml
+--json
+/Users/chids/Documents/uni/cs3bc/blockchain/build/appblockchain_qmllint.json

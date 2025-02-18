@@ -1,0 +1,196 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-2a1787100ad0fdb7d477.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "blockchain",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "all_aotstats::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_aotstats-Debug-9656d0d1dee40a425293.json",
+					"name" : "all_aotstats",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "all_qmllint::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_qmllint-Debug-fd82dc46a866daecc72b.json",
+					"name" : "all_qmllint",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "all_qmllint_json::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_qmllint_json-Debug-13c6735ca4530e264e6c.json",
+					"name" : "all_qmllint_json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "all_qmllint_module::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_qmllint_module-Debug-8c91e015431f5a39a272.json",
+					"name" : "all_qmllint_module",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "all_qmltyperegistrations::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_qmltyperegistrations-Debug-cdd45b0a85d90eeb5d93.json",
+					"name" : "all_qmltyperegistrations",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appblockchain::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appblockchain-Debug-a75616a0d1372820fd31.json",
+					"name" : "appblockchain",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appblockchain_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appblockchain_autogen-Debug-b7670e0e2941159b57fd.json",
+					"name" : "appblockchain_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appblockchain_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appblockchain_autogen_timestamp_deps-Debug-69046354e347b887928c.json",
+					"name" : "appblockchain_autogen_timestamp_deps",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appblockchain_generate_qmlls_ini_file::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appblockchain_generate_qmlls_ini_file-Debug-16d59776f177e5cc3d18.json",
+					"name" : "appblockchain_generate_qmlls_ini_file",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appblockchain_qmlimportscan::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appblockchain_qmlimportscan-Debug-77fa756d1db2ae3657e7.json",
+					"name" : "appblockchain_qmlimportscan",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appblockchain_qmllint::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appblockchain_qmllint-Debug-07ca1a43289d8d724677.json",
+					"name" : "appblockchain_qmllint",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appblockchain_qmllint_json::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appblockchain_qmllint_json-Debug-41dd48c9159fe1a8b6f5.json",
+					"name" : "appblockchain_qmllint_json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appblockchain_qmllint_module::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appblockchain_qmllint_module-Debug-7f755b8f900a6e71ec49.json",
+					"name" : "appblockchain_qmllint_module",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appblockchain_qmltyperegistration::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appblockchain_qmltyperegistration-Debug-f01b913870fc26f847ab.json",
+					"name" : "appblockchain_qmltyperegistration",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appblockchain_tooling::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appblockchain_tooling-Debug-38952a9f6adc5191f68f.json",
+					"name" : "appblockchain_tooling",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "module_appblockchain_aotstats_targets::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-module_appblockchain_aotstats_targets-Debug-143c144f7f3e49e5d613.json",
+					"name" : "module_appblockchain_aotstats_targets",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/chids/Documents/uni/cs3bc/blockchain/build",
+		"source" : "/Users/chids/Documents/uni/cs3bc/blockchain"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

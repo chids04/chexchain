@@ -1,0 +1,14 @@
+-rootPath
+/Users/chids/Documents/uni/cs3bc/blockchain
+-cmake-output
+-output-file
+/Users/chids/Documents/uni/cs3bc/blockchain/build/.qt/qml_imports/appblockchain_build.cmake
+-importPath
+/Users/chids/Documents/uni/cs3bc/blockchain/build/blockchain
+-importPath
+/Users/chids/Documents/uni/cs3bc/blockchain/build
+-importPath
+/Users/chids/Qt/6.8.0/macos/qml
+-qrcFiles
+/Users/chids/Documents/uni/cs3bc/blockchain/build/.qt/rcc/qmake_blockchain.qrc
+/Users/chids/Documents/uni/cs3bc/blockchain/build/.qt/rcc/appblockchain_raw_qml_0.qrc

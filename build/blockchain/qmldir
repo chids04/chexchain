@@ -1,0 +1,5 @@
+module blockchain
+typeinfo appblockchain.qmltypes
+prefer :/qt/qml/blockchain/
+Main 1.0 Main.qml
+

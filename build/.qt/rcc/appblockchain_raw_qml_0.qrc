@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/qt/qml/blockchain/">
+    <file alias="Main.qml">/Users/chids/Documents/uni/cs3bc/blockchain/Main.qml</file>
+  </qresource>
+</RCC>
+
