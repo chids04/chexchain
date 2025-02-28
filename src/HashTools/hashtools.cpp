@@ -39,4 +39,19 @@ namespace BlockchainAssignment::HashCode {
         return ByteArrayToString(combinedHash);
     }
 
+    std::string genSHA256(const std::string &input){
+
+        std::vector<uint8_t> hash(SHA256_DIGEST_LENGTH);
+
+        SHA256_CTX ctx;
+        SHA256_Init(&ctx);
+        SHA256_Update(&ctx, input.data(), input.size());
+        SHA256_Final(hash.data(), &ctx);
+
+        std::string hash_str = ByteArrayToString(hash);
+
+        return hash_str;
+    }
+
+
 }  

@@ -32,6 +32,9 @@ qt_add_executable(appblockchain
 
     src/Block/block.h
     src/Block/block.cpp
+
+    src/Transaction/transaction.h
+    src/Transaction/transaction.cpp
 )
 
 qt_add_qml_module(appblockchain
@@ -62,7 +65,9 @@ target_include_directories(appblockchain PRIVATE
     src/Wallet
     src/Blockchain
     src/Block
-    src/BlockchainApp)
+    src/BlockchainApp
+    src/Transaction
+    src/Utility)
 target_link_libraries(appblockchain PRIVATE Qt6::Quick OpenSSL::SSL OpenSSL::Crypto)
 
 include(GNUInstallDirs)

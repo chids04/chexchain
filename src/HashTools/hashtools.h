@@ -15,6 +15,9 @@ namespace BlockchainAssignment::HashCode {
     // Combines two SHA-256 hashes into a new SHA-256 hash
     std::string CombineHash(const std::string& hash1, const std::string& hash2);
 
+    //Generates SHA-256 and returns it as a hex string
+    std::string genSHA256(const std::string &input);
+
 }  // namespace BlockchainAssignment::HashCode
 
 #endif // HASHTOOLS_H
