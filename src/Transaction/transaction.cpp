@@ -5,6 +5,8 @@
 
 using namespace BlockchainAssignment;
 
+Transaction::Transaction() {}
+
 Transaction::Transaction(const std::string &sender, const std::string &receiver, const std::string &privKey, 
     double amount, double fee)
     : sender(sender), receiver(receiver), timestamp(Utility::genTimeStamp()), amount(amount), fee(fee)

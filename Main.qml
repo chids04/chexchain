@@ -1,11 +1,14 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick 
 import QtQuick.Controls 
+import QtQuick.Layouts
 
 import blockchain
 
 ApplicationWindow {
     visible: true
-    width: 680
+    width: 700
     height: 500
     title: "Blockchain App"
 
@@ -76,44 +79,64 @@ ApplicationWindow {
         Item{
             id: keyDisplay
 
-            height:childrenRect.height
+            height:50
+
             anchors{
-                left: blockIndex.right
+                left: parent.left
                 right: parent.right
                 leftMargin: 10
-                top: blockIndex.top
+                top: printBlock.bottom
+                rightMargin: 5
             }
 
-            Label{
-                id: pubKeyText
-                text: "Public Key:"
-                color: "white"
+            RowLayout{
+                anchors.fill:parent
 
-                TextMetrics{
-                    id: pubMetrics
-                    text: pubKeyText.text
-                }
+                ColumnLayout{
+                    Layout.fillHeight: true                    
+                    Layout.fillWidth:true
 
-                anchors {
-                    left: parent.left
-                    top: parent.top
-                }
+                    RowLayout{
+                        Layout.fillWidth: true
+                        Text{
+                            text: "Public Key"
+                            Layout.preferredWidth: 60
+                            horizontalAlignment: Text.AlignHCenter
+                            color: "white"
+                        }
 
-                TextField{
-                    id: pubKey
-                    width: keyDisplay.width - pubMetrics.width - genWallet.width - 18
-                    anchors {
-                        left:  pubKeyText.right
-                        leftMargin: 8
-                        right: keyDisplay.right
-                        top: pubKeyText.top
-                        bottom: pubKeyText.bottom
+                        TextField{
+                            id: pubKey
+                            Layout.fillWidth:true
+
+                            Connections{
+                                target: BlockchainApp
+                                function onShowPubKey(key){
+                                    pubKey.text = key
+                                }
+                            }
+                        }
                     }
 
-                    Connections{
-                        target: BlockchainApp
-                        function onShowPubKey(key){
-                            pubKey.text = key
+                    RowLayout{
+                        Layout.fillWidth: true
+                        Text{
+                            text: "Private Key"
+                            Layout.preferredWidth: 60
+                            horizontalAlignment: Text.AlignHCenter
+                            color: "white"
+                        }
+
+                        TextField{
+                            id: privKey
+                            Layout.fillWidth:true
+
+                            Connections{
+                                target: BlockchainApp
+                                function onShowPrivKey(key){
+                                    privKey.text = key
+                                }
+                            }
                         }
                     }
                 }
@@ -121,65 +144,19 @@ ApplicationWindow {
                 Button{
                     id: genWallet
                     text: "Generate\nWallet"
-                    height: pubKey.height + privKey.height + 10
+                    Layout.preferredHeight: 50
                     onClicked: BlockchainApp.generateWallet()
-                    anchors{
-                        left: pubKey.right
-                        leftMargin: 5
-                    }
                 }
 
                 Button{
                     id: validateKeys
                     text: "Validate\nKey Pair"
-
-                    anchors{
-                        top: genWallet.bottom
-                        topMargin: 5
-                        horizontalCenter: genWallet.horizontalCenter
-                    }
-
+                    Layout.preferredHeight: 50
                     onClicked: BlockchainApp.validateWallet(privKey.text,pubKey.text)
                 }
+
             }
-
-            Label{
-                id: privKeyText
-                text: "Private Key:"
-                color: "white"
-
-                TextMetrics{
-                    id: privMetrics
-                    text: privKeyText.text
-                }
-
-                anchors {
-                    top: pubKeyText.bottom
-                    topMargin: 5
-                    left: parent.left
-                }
-
-                TextField{
-                    id: privKey
-                    
-                    width: keyDisplay.width - privMetrics.width  - genWallet.width - 15
-                    anchors {
-
-                        left: privKeyText.right
-                        right: keyDisplay.right
-                        top: privKeyText.top
-                        bottom: privKeyText.bottom
-                        leftMargin: 5
-                    }
-
-                    Connections{
-                        target: BlockchainApp
-                        function onShowPrivKey(key){
-                            privKey.text = key
-                        }
-                    }
-                }
-            }
+            
         }
 
         Item{
@@ -188,126 +165,77 @@ ApplicationWindow {
             anchors {
             left: parent.left
             right: parent.right
-            bottom: parent.bottom
-            bottomMargin: 5
+            rightMargin: 5
+            top: keyDisplay.bottom
+            topMargin: 10
             }
             
             height: childrenRect.height
 
-            Button{
-                id: transactionBtn
-                text: "Create\nTransaction"
-                anchors{
-                    left: parent.left
-                    top: parent.top
-                }
+            RowLayout{
+                anchors.fill: parent
 
-                onClicked: {
 
-                    BlockchainApp.createTransaction(pubKey.text, privKey.text, receiver.text, 
-                        parseFloat(amountField.text), parseFloat(feeField.text))
-                }
-            }
 
-            Item{
-                id: amounts
+                ColumnLayout{
+                    Layout.fillHeight: true
 
-                height: childrenRect.height
-                width: childrenRect.width
-
-                anchors{
-                    leftMargin: 5
-                    left: transactionBtn.right
-                    top: parent.top
-                }
-
-                Label{
-
-                    id: amountText
-                    text: "Amount:"
-                    color: "white"
-
-                    anchors{
-                        left: parent.left
-                        top: parent.top
-                    }
-
-                    TextField{
-                        id: amountField
-                        width: 40
-
-                        anchors{
-                            left: parent.right
-                            leftMargin: 3
-                        }
-                    }
-
-                    Label{
-                        id: feeText
-                        text: "Fee:"
-                        color: "white"
-                        anchors{
-                            topMargin: 3
-                            top: amountText.bottom
-                            left: parent.left
-                        }
-
-                    }
-
-                    TextField{
-                        id: feeField
-                        width: 40
-
-                        anchors {
-                            left: amountField.left
-                            topMargin: 3
-                            top: amountField.bottom
-
-                        }
-
-                        Label{
-                            text: "Reciever Address:"
+                    RowLayout{
+                        Text{
+                            text: "Amount"
                             color: "white"
+                            Layout.preferredWidth: 50
+                            horizontalAlignment: Text.AlignHCenter
+                        }
 
-                            anchors{
-                                left: parent.right
-                                leftMargin: 5
-                                top: parent.top
-                            }
-
-                            TextField{
-                                id: receiver
-                                width: createTransaction.width - 300
-                                anchors{
-                                    left: parent.right
-                                    leftMargin: 3
-                                }
-                            }
+                        TextField{
+                            id: amountField
+                            Layout.preferredWidth: 100
                         }
                     }
 
+                    RowLayout{
+                        Text{
+                            text: "Fee"
+                            color: "white"
+                            Layout.preferredWidth: 50
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+
+                        TextField{
+                            id: feeField
+                            Layout.preferredWidth: 100
+                        }
+                    }
                 }
 
-                
+                Text{
+                    text: "Receiver Address"
+                    color: "white"
+                }
+
+                TextField{
+                    id: receiver
+                    Layout.fillWidth:true
+                }
+
+                Button{
+                    id: transactionBtn
+                    text: "Create\nTransaction"
+                    onClicked: {
+                        BlockchainApp.createTransaction(pubKey.text, privKey.text, receiver.text,
+                            parseFloat(amountField.text), parseFloat(feeField.text))
+                    }
+                }
+
+                Button {
+                    text: "Validate\nSignature"
+                    onClicked: BlockchainApp.validateTransaction()
+                }
+
             }
-
-            
-
         }
 
-        // Button{
-        //     id: genWallet
-        //     text: "Generate\nWallet"
-        //     width: 30
-        //     height: 30
-        //     anchors{
-        //         left: keyDisplay.right
-        //         right: parent.right
-        //         top: parent.bottom
-        //     }
-        // }
-        
-
-
+      
     }
 }

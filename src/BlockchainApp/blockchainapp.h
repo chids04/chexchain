@@ -1,4 +1,5 @@
 #include "blockchain.h"
+#include "transaction.h"
 
 #include <iostream>
 #include <QObject>
@@ -23,9 +24,11 @@ public slots:
     void getBlockInfo(int index);
     void generateWallet();
     void validateWallet(const QString &priv, const QString &pub);
-    void createTransaction(const QString &sender, const QString &privKey, 
+    void createTransaction(const QString &sender, const QString &privKey,
         const QString &receiver, double amount, double fee);
+    void validateTransaction();
 
 private:
     Blockchain blockchain;
+    Transaction transaction;
 };

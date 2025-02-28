@@ -7,6 +7,7 @@ class Transaction{
     
 
 public:
+    Transaction();
     Transaction(const std::string &sender, const std::string &receiver,
         const std::string &privKey, double amount, double fee);
 

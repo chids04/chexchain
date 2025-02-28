@@ -1,6 +1,5 @@
 #include "blockchainapp.h"
 #include "wallet.h"
-#include "transaction.h"
 
 
 using namespace BlockchainAssignment::Wallet;
@@ -39,16 +38,28 @@ void BlockchainApp::validateWallet(const QString &priv, const QString &pub)
     }
 }
 
-void BlockchainApp::createTransaction(const QString &sender, const QString &privKey, const QString &receiver, 
+void BlockchainApp::createTransaction(const QString &sender, const QString &privKey, const QString &receiver,
     double amount, double fee)
 {
     std::string senderStr = sender.toStdString();
     std::string receiverStr = receiver.toStdString();
     std::string privKeyStr = privKey.toStdString();
     
-    Transaction transaction(senderStr, receiverStr, privKeyStr, amount, fee);
+    transaction = Transaction(senderStr, receiverStr, privKeyStr, amount, fee);
 
     std::string log = transaction.printTransaction();
     emit printMsg(QString::fromStdString(log));
     
+}
+
+void BlockchainApp::validateTransaction()
+{
+    bool isValid = Wallet::Wallet::ValidateSignature(transaction.sender, transaction.hash, transaction.sig);
+
+    if(isValid){
+        emit printMsg("Transaction has a valid signature");
+    }
+    else{
+        emit printMsg("Transaction has an invalid signature");
+    }
 }
