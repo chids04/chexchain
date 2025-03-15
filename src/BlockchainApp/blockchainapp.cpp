@@ -17,12 +17,10 @@ void BlockchainApp::getBlockInfo(int index){
 
 void BlockchainApp::generateWallet()
 {
-    
-    std::string priv_key;
-    Wallet wallet(priv_key);
+    auto [priv_key, pub_key] = blockchain.generateWallet();
 
     emit showPrivKey(QString::fromStdString(priv_key));
-    emit showPubKey(QString::fromStdString(wallet.publicID));
+    emit showPubKey(QString::fromStdString(pub_key));
 }
 
 void BlockchainApp::validateWallet(const QString &priv, const QString &pub)
@@ -30,12 +28,7 @@ void BlockchainApp::validateWallet(const QString &priv, const QString &pub)
     std::string pub_key = pub.toStdString();
     std::string priv_key = priv.toStdString();
 
-    if(Wallet::Wallet::ValidatePrivateKey(priv_key, pub_key)){
-        emit printMsg("This is a valid private/public key pair");
-    }
-    else{
-        emit printMsg("This is an invalid private/public key pair");
-    }
+    emit printMsg(QString::fromStdString(blockchain.validateWallet(priv_key, pub_key)));
 }
 
 void BlockchainApp::createTransaction(const QString &sender, const QString &privKey, const QString &receiver,
@@ -45,21 +38,32 @@ void BlockchainApp::createTransaction(const QString &sender, const QString &priv
     std::string receiverStr = receiver.toStdString();
     std::string privKeyStr = privKey.toStdString();
     
-    transaction = Transaction(senderStr, receiverStr, privKeyStr, amount, fee);
-
-    std::string log = transaction.printTransaction();
-    emit printMsg(QString::fromStdString(log));
-    
+    emit printMsg(QString::fromStdString(blockchain.createTransaction(senderStr, privKeyStr, receiverStr, amount, fee)));
 }
 
 void BlockchainApp::validateTransaction()
 {
-    bool isValid = Wallet::Wallet::ValidateSignature(transaction.sender, transaction.hash, transaction.sig);
+    // bool isValid = Wallet::Wallet::ValidateSignature(transaction.sender, transaction.hash, transaction.sig);
 
-    if(isValid){
-        emit printMsg("Transaction has a valid signature");
-    }
-    else{
-        emit printMsg("Transaction has an invalid signature");
-    }
+    // if(isValid){
+    //     emit printMsg("Transaction has a valid signature");
+    // }
+    // else{
+    //     emit printMsg("Transaction has an invalid signature");
+    // }
+}
+
+void BlockchainApp::printPendingTransactions()
+{
+    emit printMsg(QString::fromStdString(blockchain.printPendingTransactions()));
+}
+
+void BlockchainApp::readAllBlocks()
+{
+    emit printMsg(QString::fromStdString(blockchain.readAllBlocks()));
+}
+
+void BlockchainApp::generateBlock()
+{
+    blockchain.generateBlock();
 }

@@ -1,56 +1,71 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick 
-import QtQuick.Controls 
+import QtQuick.Controls
 import QtQuick.Layouts
 
 import blockchain
 
 ApplicationWindow {
     visible: true
-    width: 700
-    height: 500
+    width: 800
+    height: 600
     title: "Blockchain App"
 
     Rectangle {
         anchors.fill: parent
         color: "#181818"
 
-        TextArea {
-            id: textArea
+        ScrollView{
+            id: scrollView
+
             anchors {
                 top: parent.top
                 left: parent.left
                 right: parent.right
             }
-
-
+            
             height: 314
-            anchors.margins: 12
-            color: "white"
-            background: Rectangle {
-                color: "black"
-                border.color: "#1f1f1f"
-                border.width: 2
-            }
 
-            placeholderText: "Enter text here..."
+            TextArea {
+                id: textArea
+                width: parent.width
+                wrapMode: Text.Wrap
+                // anchors {
+                //     top: parent.top
+                //     left: parent.left
+                //     right: parent.right
+                // }
 
-            Connections{
-                target: BlockchainApp
 
-                function onPrintMsg(message){
-                    textArea.text = message
+                //height: 314
+                //anchors.margins: 12
+                color: "white"
+                background: Rectangle {
+                    color: "black"
+                    border.color: "#1f1f1f"
+                    border.width: 2
                 }
 
+                placeholderText: "Enter text here..."
+
+                Connections{
+                    target: BlockchainApp
+
+                    function onPrintMsg(message){
+                        textArea.text = message
+                    }
+
+                }
             }
         }
+        
 
         Button{
             id: printBlock
             anchors{
-                left: textArea.left
-                top: textArea.bottom
+                left: scrollView.left
+                top: scrollView.bottom
                 topMargin: 5
             }
             height: 30
@@ -68,7 +83,7 @@ ApplicationWindow {
             id: blockIndex
             anchors{
                 left: printBlock.right
-                leftMargin: 10
+                leftMargin: 5
                 verticalCenter: printBlock.verticalCenter
             }
 
@@ -76,16 +91,56 @@ ApplicationWindow {
             width: 40
         }
 
+        Button{
+            id: readAll
+            text: "Print All Blocks"
+            height: 30
+
+            anchors{
+                left: blockIndex.right
+                top: scrollView.bottom
+                leftMargin: 5
+                topMargin: 5
+            }
+
+            onClicked: BlockchainApp.readAllBlocks();
+        }
+
+        Button{
+            id: genBlock
+            text: "Generate\nNew Block"
+
+            anchors{
+                left: scrollView.left
+                top: printBlock.bottom
+                topMargin: 5
+            }
+
+            onClicked: BlockchainApp.generateBlock()
+        }
+
+        Button {
+            id: viewTransactions
+            text: "View Pending\nTransactions"
+
+            anchors{
+                top: genBlock.top
+                left: genBlock.right
+                leftMargin: 5
+            }
+
+            onClicked: BlockchainApp.printPendingTransactions()
+        }
+
         Item{
             id: keyDisplay
-
             height:50
 
             anchors{
                 left: parent.left
                 right: parent.right
                 leftMargin: 10
-                top: printBlock.bottom
+                top: genBlock.bottom
                 rightMargin: 5
             }
 

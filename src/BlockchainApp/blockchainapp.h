@@ -22,11 +22,14 @@ signals:
 
 public slots:
     void getBlockInfo(int index);
+    void readAllBlocks();
+    void generateBlock();
     void generateWallet();
     void validateWallet(const QString &priv, const QString &pub);
     void createTransaction(const QString &sender, const QString &privKey,
         const QString &receiver, double amount, double fee);
     void validateTransaction();
+    void printPendingTransactions();
 
 private:
     Blockchain blockchain;
