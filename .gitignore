@@ -1,3 +1,4 @@
 .DS_Store
 .qmlls.ini
+CMakeLists.txt.user
 build/
