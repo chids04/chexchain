@@ -47,7 +47,6 @@ ApplicationWindow {
                     border.width: 2
                 }
 
-                placeholderText: "Enter text here..."
 
                 Connections{
                     target: BlockchainApp
@@ -106,32 +105,77 @@ ApplicationWindow {
             onClicked: BlockchainApp.readAllBlocks();
         }
 
-        Button{
-            id: genBlock
-            text: "Generate\nNew Block"
-
+        Item{
+            id: blockUtils
             anchors{
-                left: scrollView.left
+                left: parent.left
+                leftMargin: 5
+                right: parent.right
+                rightMargin: 5
                 top: printBlock.bottom
                 topMargin: 5
             }
 
-            onClicked: BlockchainApp.generateBlock()
-        }
+            height: childrenRect.height
 
-        Button {
-            id: viewTransactions
-            text: "View Pending\nTransactions"
+            Button{
+                id: genBlock
+                text: "Generate\nNew Block"
 
-            anchors{
-                top: genBlock.top
-                left: genBlock.right
-                leftMargin: 5
+                anchors{
+                    left: blockUtils.left
+                    top: blockUtils.top
+                }
+
+                onClicked:{
+                    if(minerAddress.text == ""){
+                        textArea.text = "Please enter a miner address"
+                    }
+                    else{
+                        BlockchainApp.generateBlock(minerAddress.text)
+                    }
+                } 
             }
 
-            onClicked: BlockchainApp.printPendingTransactions()
-        }
+            Text{
+                id: minerAddressText
+                text: "Miner Address:"
+                color: "white"
 
+                anchors {
+                    left: genBlock.right
+                    leftMargin: 5
+                    verticalCenter: genBlock.verticalCenter
+                }
+            }
+
+            TextField{
+                id: minerAddress
+                anchors{
+                    left: minerAddressText.right
+                    leftMargin:5
+                    right: viewTransactions.left
+                    rightMargin: 5
+                    verticalCenter: genBlock.verticalCenter
+                }
+
+            }
+
+
+            Button {
+                id: viewTransactions
+                text: "View Pending\nTransactions"
+
+                anchors{
+                    top: genBlock.top
+                    right: blockUtils.right
+                    leftMargin: 5
+                }
+
+                onClicked: BlockchainApp.printPendingTransactions()
+            }
+        }
+        
         Item{
             id: keyDisplay
             height:50
@@ -140,7 +184,8 @@ ApplicationWindow {
                 left: parent.left
                 right: parent.right
                 leftMargin: 10
-                top: genBlock.bottom
+                top: blockUtils.bottom
+                topMargin: 5
                 rightMargin: 5
             }
 
@@ -278,8 +323,25 @@ ApplicationWindow {
                     id: transactionBtn
                     text: "Create\nTransaction"
                     onClicked: {
-                        BlockchainApp.createTransaction(pubKey.text, privKey.text, receiver.text,
-                            parseFloat(amountField.text), parseFloat(feeField.text))
+                        if(pubKey.text == ""){
+                            textArea.text = "Please enter a public key"
+                        }
+                        else if(privKey.text == ""){
+                            textArea.text = "Please enter a private key"
+                        }
+                        else if(receiver.text == ""){
+                            textArea.text = "Please enter a receiever"
+                        }
+                        else if(amountField.text == "" || isNaN(parseFloat(amountField.text))){
+                            textArea.text = "Please enter a valid amount to send"
+                        }
+                        else if(feeField.text == "" || isNaN(parseFloat(feeField.text))){
+                            textArea.text = "Please enter a valid fee"
+                        }
+                        else{
+                            BlockchainApp.createTransaction(pubKey.text, privKey.text, receiver.text,
+                                parseFloat(amountField.text), parseFloat(feeField.text))
+                        }
                     }
                 }
 

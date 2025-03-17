@@ -4,7 +4,7 @@
 #include "transaction.h"
 
 #include <algorithm>
-#include <iterator>
+#include <string>
 
 using namespace BlockchainAssignment::Wallet;
 
@@ -13,25 +13,22 @@ Blockchain::Blockchain()
     blocks.push_back(std::make_shared<Block>());
 }
 
-void Blockchain::generateBlock()
+void Blockchain::generateBlock(const std::string &miner_address)
 {
-    int x;
+    int x = std::min(static_cast<int>(transactionPool.size()), MAX_TRANSACTIONS);
     std::vector<std::unique_ptr<Transaction>> to_process;
-    
-    if(transactionPool.size() < MAX_TRANSACTIONS){
-        x = transactionPool.size();
-    }
-    else{
-        x = MAX_TRANSACTIONS;
-    }
 
     to_process.reserve(x);
 
     //move ownership of transaction to this temp array, which will then be moved to the block, moving better than copying
-    std::move(transactionPool.begin(), transactionPool.begin() + x, std::back_inserter(to_process));
-    transactionPool.erase(transactionPool.begin(), transactionPool.begin() + x);
+    //in c++ u can create virtual heap over the vector, so that i can efficiently sort transactions for miners to pick
+    for(int i=0; i<x; ++i){
+        std::pop_heap(transactionPool.begin(), transactionPool.end(), TransactionComparator());
+        to_process.push_back(std::move(transactionPool.back()));
+        transactionPool.pop_back();
+    }
 
-    blocks.push_back(std::make_shared<Block>(blocks.back(), std::move(to_process)));
+    blocks.push_back(std::make_shared<Block>(blocks.back(), miner_address, std::move(to_process)));
 }
 
 std::string Blockchain::readAllBlocks()
@@ -60,7 +57,10 @@ std::string Blockchain::createTransaction(const std::string &sender, const std::
 {
     auto transaction = std::make_unique<Transaction>(sender, receiver, privKey, amount, fee);
     std::string log = transaction->printTransaction();
+    
     transactionPool.push_back(std::move(transaction));
+    std::push_heap(transactionPool.begin(), transactionPool.end(), TransactionComparator());
+
 
     return log;
 

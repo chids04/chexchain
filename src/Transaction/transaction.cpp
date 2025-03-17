@@ -16,6 +16,8 @@ Transaction::Transaction(const std::string &sender, const std::string &receiver,
 
     hash = HashCode::genSHA256(hash_data);
     sig = Wallet::Wallet::CreateSignature(sender, privKey, hash);
+
+    //add error checking if failed to create a transaction
 }
 
 std::string Transaction::printTransaction()

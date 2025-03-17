@@ -26,7 +26,7 @@ namespace BlockchainAssignment {
             
         private:
             // Creates an EC_KEY from a public ID and optional private key
-            static EC_KEY* createKey(const std::string& publicID, const std::string& privateKey = "");
+            static EVP_PKEY* createKey(const std::string& publicID, const std::string& privateKey = "");
             
             // Base64 encoding and decoding utility functions
             static std::string base64_encode(const std::vector<unsigned char>& input);

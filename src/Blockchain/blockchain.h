@@ -9,11 +9,17 @@
 
 constexpr int MAX_TRANSACTIONS = 5;
 
+struct TransactionComparator {
+    bool operator()(const std::unique_ptr<Transaction>& a, const std::unique_ptr<Transaction>& b) const {
+        return a->fee < b->fee;
+    }
+};
+
 class Blockchain{
 
 public:
     Blockchain();
-    void generateBlock();
+    void generateBlock(const std::string &miner_address);
     std::string readAllBlocks();
     std::string blockInfo(int index);
 

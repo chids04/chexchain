@@ -34,9 +34,9 @@ void BlockchainApp::validateWallet(const QString &priv, const QString &pub)
 void BlockchainApp::createTransaction(const QString &sender, const QString &privKey, const QString &receiver,
     double amount, double fee)
 {
-    std::string senderStr = sender.toStdString();
-    std::string receiverStr = receiver.toStdString();
-    std::string privKeyStr = privKey.toStdString();
+    auto senderStr = sender.toStdString();
+    auto receiverStr = receiver.toStdString();
+    auto privKeyStr = privKey.toStdString();
     
     emit printMsg(QString::fromStdString(blockchain.createTransaction(senderStr, privKeyStr, receiverStr, amount, fee)));
 }
@@ -63,7 +63,9 @@ void BlockchainApp::readAllBlocks()
     emit printMsg(QString::fromStdString(blockchain.readAllBlocks()));
 }
 
-void BlockchainApp::generateBlock()
+void BlockchainApp::generateBlock(const QString &miner_address)
 {
-    blockchain.generateBlock();
+    auto minerAddressStr = miner_address.toStdString();
+
+    blockchain.generateBlock(minerAddressStr);
 }
