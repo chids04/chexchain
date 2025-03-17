@@ -19,7 +19,7 @@ find_package(OpenSSL REQUIRED)
 qt_standard_project_setup(REQUIRES 6.5)
 
 qt_add_executable(appblockchain
-    main.cpp
+    src/main.cpp
 
     src/HashTools/hashtools.cpp
     src/HashTools/hashtools.h
@@ -41,7 +41,7 @@ qt_add_qml_module(appblockchain
     URI blockchain
     VERSION 1.0
     QML_FILES
-        Main.qml
+        ui/Main.qml
     
     SOURCES
         src/BlockchainApp/blockchainapp.cpp

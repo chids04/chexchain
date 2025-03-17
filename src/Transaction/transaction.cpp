@@ -3,6 +3,9 @@
 #include "hashtools.h"
 #include "wallet.h"
 
+#include <exception>
+#include <stdexcept>
+
 using namespace BlockchainAssignment;
 
 Transaction::Transaction() {}
@@ -18,6 +21,10 @@ Transaction::Transaction(const std::string &sender, const std::string &receiver,
     sig = Wallet::Wallet::CreateSignature(sender, privKey, hash);
 
     //add error checking if failed to create a transaction
+    if(sig == "null"){
+        //throw exception
+        throw std::runtime_error("Error in creating transaction, sender and/or receiver keys may be invalid");
+    }
 }
 
 std::string Transaction::printTransaction()

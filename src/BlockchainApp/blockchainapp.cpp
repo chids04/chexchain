@@ -1,5 +1,7 @@
 #include "blockchainapp.h"
 #include "wallet.h"
+#include <exception>
+#include <stdexcept>
 
 
 using namespace BlockchainAssignment::Wallet;
@@ -37,8 +39,15 @@ void BlockchainApp::createTransaction(const QString &sender, const QString &priv
     auto senderStr = sender.toStdString();
     auto receiverStr = receiver.toStdString();
     auto privKeyStr = privKey.toStdString();
+
+    try{
+        auto res = blockchain.createTransaction(senderStr, privKeyStr, receiverStr, amount, fee);
+        emit printMsg(QString::fromStdString(blockchain.createTransaction(senderStr, privKeyStr, receiverStr, amount, fee)));
+    }
+    catch(const std::runtime_error &ex){
+        emit printMsg(QString::fromStdString(ex.what()));
+    }
     
-    emit printMsg(QString::fromStdString(blockchain.createTransaction(senderStr, privKeyStr, receiverStr, amount, fee)));
 }
 
 void BlockchainApp::validateTransaction()
