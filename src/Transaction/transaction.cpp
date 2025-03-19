@@ -3,7 +3,6 @@
 #include "hashtools.h"
 #include "wallet.h"
 
-#include <exception>
 #include <stdexcept>
 
 using namespace BlockchainAssignment;

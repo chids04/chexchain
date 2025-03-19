@@ -2,6 +2,7 @@
 #include "wallet.h"
 #include <exception>
 #include <stdexcept>
+#include <string>
 
 
 using namespace BlockchainAssignment::Wallet;
@@ -77,4 +78,16 @@ void BlockchainApp::generateBlock(const QString &miner_address)
     auto minerAddressStr = miner_address.toStdString();
 
     blockchain.generateBlock(minerAddressStr);
+}
+
+void BlockchainApp::validateBlockchain() {
+    int idx = blockchain.validateBlockchain();
+    if(idx == 0){
+        emit printMsg("All blocks are valid");
+    }
+    else{
+        emit printMsg("Blockchain starting from block index " + QString::fromStdString(std::to_string(idx)) + " is not valid");
+    }
+
+    
 }

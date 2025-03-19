@@ -24,6 +24,8 @@ public slots:
     void getBlockInfo(int index);
     void readAllBlocks();
     void generateBlock(const QString &miner_address);
+    void validateBlockchain();
+
     void generateWallet();
     void validateWallet(const QString &priv, const QString &pub);
     void createTransaction(const QString &sender, const QString &privKey,

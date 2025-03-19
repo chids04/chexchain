@@ -22,7 +22,9 @@ public:
     void generateBlock(const std::string &miner_address);
     std::string readAllBlocks();
     std::string blockInfo(int index);
+    int validateBlockchain();
 
+    float checkBalance(const std::string& address);
     std::string createTransaction(const std::string &sender, const std::string &privKey, const std::string &receiver,
         double amount, double fee);
     std::string printPendingTransactions();

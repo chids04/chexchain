@@ -161,18 +161,30 @@ ApplicationWindow {
 
             }
 
-
             Button {
                 id: viewTransactions
                 text: "View Pending\nTransactions"
 
                 anchors{
-                    top: genBlock.top
-                    right: blockUtils.right
+                    top: blockUtils.top
+                    right: validateBlocks.left
+                    rightMargin: 5
                     leftMargin: 5
                 }
 
                 onClicked: BlockchainApp.printPendingTransactions()
+            }
+
+            Button {
+                id: validateBlocks
+                text: "Validate\n Blockchain"
+
+                anchors {
+                    top: genBlock.top
+                    right: blockUtils.right
+                }
+
+                onClicked: BlockchainApp.validateBlockchain()
             }
         }
         
@@ -253,6 +265,13 @@ ApplicationWindow {
                     text: "Validate\nKey Pair"
                     Layout.preferredHeight: 50
                     onClicked: BlockchainApp.validateWallet(privKey.text,pubKey.text)
+                }
+
+                Button {
+                    id: checkBal
+                    text: "Check\nBalance"
+                    Layout.preferredHeight: 50
+
                 }
 
             }

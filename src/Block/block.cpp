@@ -104,3 +104,7 @@ std::string Block::getInfo()
     return msg;
 }
 
+std::vector<std::unique_ptr<Transaction>> Block::getTransactions() {
+    return transactions;
+}
+

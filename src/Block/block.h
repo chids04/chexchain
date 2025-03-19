@@ -25,6 +25,8 @@ public:
     std::string createHash();
     std::string getInfo();
 
+    std::vector<std::unique_ptr<Transaction>> getTransactions();
+
 private:
     std::vector<std::unique_ptr<Transaction>> transactions;
     void mine();
