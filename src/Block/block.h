@@ -24,11 +24,14 @@ public:
 
     std::string createHash();
     std::string getInfo();
+    std::string merkle_root;
 
-    std::vector<std::unique_ptr<Transaction>> getTransactions();
+    const std::vector<std::unique_ptr<Transaction>>& getTransactions();
+
 
 private:
     std::vector<std::unique_ptr<Transaction>> transactions;
+    std::string computeMerkleRoot();
     void mine();
 
     

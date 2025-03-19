@@ -28,6 +28,8 @@ public slots:
 
     void generateWallet();
     void validateWallet(const QString &priv, const QString &pub);
+    void checkBalance(const QString &address);
+
     void createTransaction(const QString &sender, const QString &privKey,
         const QString &receiver, double amount, double fee);
     void validateTransaction();

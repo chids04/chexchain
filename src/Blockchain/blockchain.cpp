@@ -80,12 +80,15 @@ float Blockchain::checkBalance(const std::string& address) {
 
     for(const auto &pending_tx : transactionPool){
         if(pending_tx->receiver == address){
-            
+            bal += pending_tx->amount;                     
+        }
+        else if(pending_tx->sender == address){
+            bal -= pending_tx->amount;
         }
     }
 
     for(const auto &b: blocks){
-        auto transactions = b->getTransactions();
+        const auto& transactions = b->getTransactions();
 
         for(const auto &tx : transactions){
             if(tx->receiver == address){
@@ -105,7 +108,7 @@ std::string Blockchain::createTransaction(const std::string &sender, const std::
 {
     float bal = checkBalance(sender);
 
-    if(bal < amount){
+    if(bal < amount + fee){
         return "Sender has insufficient funds";
     }
 

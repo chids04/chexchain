@@ -2,6 +2,7 @@
 
 #include <string>
 
+extern int nonce;
 
 class Transaction{
     
@@ -12,7 +13,6 @@ public:
         const std::string &privKey, double amount, double fee);
 
     std::string printTransaction();
-    
 
     std::string hash;
     std::string sig;
@@ -22,4 +22,5 @@ public:
     long long timestamp;
     double amount;
     double fee;
+    int tx_nonce;
 };

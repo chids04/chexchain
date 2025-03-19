@@ -271,6 +271,15 @@ ApplicationWindow {
                     id: checkBal
                     text: "Check\nBalance"
                     Layout.preferredHeight: 50
+                    
+                    onClicked: {
+                        if(pubKey.text == ""){
+                            textArea.text = "Please enter a public key"
+                    }
+                        else{
+                            BlockchainApp.checkBalance(pubKey.text)
+                        }
+                    }
 
                 }
 

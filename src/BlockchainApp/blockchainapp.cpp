@@ -34,6 +34,13 @@ void BlockchainApp::validateWallet(const QString &priv, const QString &pub)
     emit printMsg(QString::fromStdString(blockchain.validateWallet(priv_key, pub_key)));
 }
 
+void BlockchainApp::checkBalance(const QString &address) {
+    
+    float bal = blockchain.checkBalance(address.toStdString());
+
+    emit printMsg("Wallet balance is " + QString::fromStdString(std::to_string(bal)));
+}
+
 void BlockchainApp::createTransaction(const QString &sender, const QString &privKey, const QString &receiver,
     double amount, double fee)
 {

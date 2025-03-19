@@ -25,10 +25,13 @@ Block::Block(std::shared_ptr<Block> prev_block, std::string miner_address, std::
         std::make_move_iterator(tx.end())
     );
 
+    //can calculate block reward and being merkle root implementation
+
     for(const auto &tx: transactions){
         block_reward += tx->fee;
     }
 
+    merkle_root = computeMerkleRoot();
 
     mine();
 }
@@ -43,7 +46,7 @@ Block::Block()
 
 std::string Block::createHash()
 {
-    std::string input = std::to_string(index) + std::to_string(timestamp) + std::to_string(nonce) + 
+    std::string input = std::to_string(index) + std::to_string(timestamp) + merkle_root + std::to_string(nonce) + 
         prev_hash + std::to_string(block_reward);
 
     std::string str_hash = HashCode::genSHA256(input);
@@ -73,8 +76,6 @@ void Block::mine()
             isValid = true;
         }
     }
-
-    
 }
 
 std::string Block::getInfo()
@@ -89,14 +90,12 @@ std::string Block::getInfo()
     }
 
     else{
-
-        
         msg =  "Block Index: " + std::to_string(index) + "\t\t" + "Timestamp: " + time_str + "\n" +
-            "Hash: " + hash + "\n" + "Previous Hash: " + prev_hash + "\nNonce: " + std::to_string(nonce) + 
+            "Hash: " + hash + "\n" + "Previous Hash: " + prev_hash +  "\nMerkle Root of Transactions: " + merkle_root + "\nNonce: " + std::to_string(nonce) + 
             + "\nDifficulty: " + std::to_string(DIFFICULTY_THRESHOLD) + "\nMiner Address: " + transactions[0]->receiver + "\nTotal Block Reward: " + std::to_string(block_reward) +
             "\nFees Recieved: " + std::to_string(std::max(block_reward-MINE_REWARD, MINE_REWARD))+ "\nTransactions: " + std::to_string(transactions.size()) + "\n\n" ;
-
     }
+
     for(const auto &tx : transactions){
         msg += tx->printTransaction() + "\n\n";
     }
@@ -104,7 +103,53 @@ std::string Block::getInfo()
     return msg;
 }
 
-std::vector<std::unique_ptr<Transaction>> Block::getTransactions() {
+const std::vector<std::unique_ptr<Transaction>>& Block::getTransactions() {
     return transactions;
+}
+
+std::string Block::computeMerkleRoot() {
+    std::vector<std::string> leaf_nodes;
+
+    if(transactions.size() == 0){
+        return "";
+    }
+
+    for(const auto &tx: transactions){
+        //first add all hashes to an array
+        leaf_nodes.push_back(tx->hash);
+    }
+
+    /*
+    need to concat left and right node and then hash the result
+    if odd number of transactions, then the last hash is hashed with itself
+    final remaining hash is the merkle root
+    */
+
+    while(leaf_nodes.size() > 1){
+        std::vector<std::string> parent_nodes;
+        
+        for(int i=0; i<leaf_nodes.size(); i+=2){
+            std::string left = leaf_nodes[i];
+            std::string right;
+
+            if(i + 1 < leaf_nodes.size()){
+                right = leaf_nodes[i + 1];
+            }
+            else{
+                right = leaf_nodes[i];
+            }
+
+            //combine and push to parent nodes
+            std::string combined_hash = HashCode::CombineHash(left, right);
+            parent_nodes.push_back(combined_hash);
+        }
+
+        //update leaf_nodes to next level (parent_nodes)
+        leaf_nodes = parent_nodes;
+    }
+
+    return leaf_nodes[0];
+
+
 }
 

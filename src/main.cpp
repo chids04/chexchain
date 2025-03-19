@@ -1,9 +1,7 @@
-#include <iostream>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <qDebug>
 
-#include "wallet.h"
 #include "blockchainapp.h"
 
 int main(int argc, char *argv[])
