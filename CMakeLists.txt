@@ -48,6 +48,22 @@ qt_add_qml_module(appblockchain
         src/BlockchainApp/blockchainapp.h
 )
 
+if(WIN32)
+    add_custom_target(kill_appblockchain
+        COMMAND taskkill /IM appblockchain.exe /F || exit 0
+        COMMENT "Killing previous instance of appblockchain.exe"
+    )
+else()  # Linux/macOS
+    add_custom_target(kill_appblockchain
+        COMMAND killall -9 appblockchain || true
+        COMMENT "Killing previous instance of appblockchain"
+    )
+endif()
+
+# Make the apphex-launcher target depend on the kill target
+add_dependencies(appblockchain kill_appblockchain)
+
+
 
 target_include_directories(appblockchain PRIVATE 
     src

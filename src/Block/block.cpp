@@ -107,6 +107,61 @@ const std::vector<std::unique_ptr<Transaction>>& Block::getTransactions() {
     return transactions;
 }
 
+std::vector<std::pair<std::string, bool>> Block::getMerkleProof(int txIndex) {
+    std::vector<std::pair<std::string, bool>> proof;
+    std::vector<std::string> leaf_nodes;
+
+    //add leaf nodes (transaction hashes) to bottom of tree;
+    for(const auto &tx : transactions){
+        leaf_nodes.push_back(tx->hash);
+    }
+
+    //now we combine and hash, duplicating last item if order number of nodes
+    while(leaf_nodes.size() > 1){
+        std::vector<std::string> parent_nodes;
+        for(int i=0; i<leaf_nodes.size(); i+=2){
+            std::string left = leaf_nodes[i];
+            std::string right;
+            
+            if(i+1 < leaf_nodes.size()){
+                right = leaf_nodes[i+1];
+            }
+            else{
+                right = left;
+            }
+
+            //now we check if left or right is a sibling to the transaction we are verifying
+            if(i == txIndex || i+1 == txIndex){
+                if(txIndex % 2 == 0){
+                    /*
+                    target index is left (even indexes always left node in binary tree)
+                    so sibling is right
+                    bool set to false to indicate on right
+                    */
+                    proof.push_back({right, false});
+                }
+                else{
+                    //sibling is left, set bool to true to indicate this
+                    proof.push_back({left, true});
+                }
+                
+                txIndex = i / 2;
+            }
+
+            //we concat left right and hash to continue building tree, for next level
+            std::string hash = HashCode::CombineHash(left, right);
+            
+            parent_nodes.push_back(hash);
+        }
+
+        //move onto next level
+        leaf_nodes=parent_nodes;
+    }
+
+    //proof contains ordered list of siblings for verification
+    return proof;
+}
+
 std::string Block::computeMerkleRoot() {
     std::vector<std::string> leaf_nodes;
 
@@ -139,7 +194,7 @@ std::string Block::computeMerkleRoot() {
                 right = leaf_nodes[i];
             }
 
-            //combine and push to parent nodes
+            //combine, hash then push to parent nodes list
             std::string combined_hash = HashCode::CombineHash(left, right);
             parent_nodes.push_back(combined_hash);
         }
@@ -149,7 +204,8 @@ std::string Block::computeMerkleRoot() {
     }
 
     return leaf_nodes[0];
-
-
 }
+
+
+
 

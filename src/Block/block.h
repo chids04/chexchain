@@ -27,6 +27,14 @@ public:
     std::string merkle_root;
 
     const std::vector<std::unique_ptr<Transaction>>& getTransactions();
+    
+
+    /* gets the required sibling hashes needed to reconstruct the merkle root
+    in bitcoin, this is used by verification nodes to verify a transaction in a block
+    they request the merkle proof from a full node and verify the transaction is in the merkle root using the merkle proof
+     */
+    std::vector<std::pair<std::string, bool>> getMerkleProof(int index);
+    
 
 
 private:
