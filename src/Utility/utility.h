@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <chrono>
 #include <ctime>
 #include <sstream>
@@ -13,7 +12,6 @@ namespace BlockchainAssignment::Utility{
     inline long long genTimeStamp(){
         auto now = std::chrono::system_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
-    
         return duration.count();
     }
 
@@ -29,5 +27,4 @@ namespace BlockchainAssignment::Utility{
 
         return oss.str();
     }
-    
 }

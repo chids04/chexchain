@@ -3,6 +3,7 @@
 #include "hashtools.h"
 #include "wallet.h"
 
+#include <print>
 #include <stdexcept>
 
 using namespace BlockchainAssignment;
@@ -25,8 +26,9 @@ Transaction::Transaction(const std::string &sender, const std::string &receiver,
 
     hash = HashCode::genSHA256(hash_data);
     sig = Wallet::Wallet::CreateSignature(sender, privKey, hash);
-
-
+    
+    std::print("transaction sig {}", sig);
+    
     //add error checking if failed to create a transaction
     if(sig == "null"){
         //throw exception and revert nonce to prevent int overflow from repeatedly sending false transactions

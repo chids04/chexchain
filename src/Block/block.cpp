@@ -31,7 +31,7 @@ Block::Block(std::shared_ptr<Block> prev_block, std::string miner_address, std::
         block_reward += tx->fee;
     }
 
-    merkle_root = computeMerkleRoot();
+    merkle_root = computeMerkleRoot(transactions);
 
     mine();
 }
@@ -162,7 +162,7 @@ std::vector<std::pair<std::string, bool>> Block::getMerkleProof(int txIndex) {
     return proof;
 }
 
-std::string Block::computeMerkleRoot() {
+std::string Block::computeMerkleRoot(const std::vector<std::unique_ptr<Transaction>> &transactions) {
     std::vector<std::string> leaf_nodes;
 
     if(transactions.size() == 0){

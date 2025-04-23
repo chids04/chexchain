@@ -1,6 +1,5 @@
 #include "blockchainapp.h"
 #include "wallet.h"
-#include <exception>
 #include <stdexcept>
 #include <string>
 
@@ -88,12 +87,19 @@ void BlockchainApp::generateBlock(const QString &miner_address)
 }
 
 void BlockchainApp::validateBlockchain() {
-    int idx = blockchain.validateBlockchain();
-    if(idx == 0){
+    auto error = blockchain.validateBlockchain();
+    if(error.type == Blockchain::BlockchainErrorType::None){
         emit printMsg("All blocks are valid");
     }
     else{
-        emit printMsg("Blockchain starting from block index " + QString::fromStdString(std::to_string(idx)) + " is not valid");
+        
+        if(error.type == Blockchain::BlockchainErrorType::HashMismatch){
+            emit printMsg("Hash mismatch at block index " + QString::number(error.blockIndex));
+        }
+
+        else if(error.type == Blockchain::BlockchainErrorType::MerkleRootMismatch){
+            emit printMsg("Merkle root mismatch at block index " + QString::number(error.blockIndex));
+        }
     }
 
     

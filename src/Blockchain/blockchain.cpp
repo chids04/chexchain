@@ -58,19 +58,36 @@ std::string Blockchain::blockInfo(int index)
 }
 
 //validates blocks and if invalid, returns the first invalid block, else returns 0
-int Blockchain::validateBlockchain() {
+auto Blockchain::validateBlockchain() -> BlockchainError
+{
     for(int i=0; i<blocks.size(); i++){
         if(i == 0){
             continue;
         }
         else{
+            //make sure the hashes are correct
             if(blocks[i-1]->hash != blocks[i]->prev_hash){
-                return i;
+                return { BlockchainErrorType::HashMismatch, i};
+            }
+
+            //make sure the transactions make the same merkle root
+            const auto &transactions = blocks[i]->getTransactions();
+            if(Block::computeMerkleRoot(transactions) != blocks[i]->merkle_root){
+                return { BlockchainErrorType::MerkleRootMismatch, i};
+            }
+            
+            //verify the signature for each of the transactions
+            int txIdx = 0;
+            for(const auto& tx: transactions){
+                if(Wallet::ValidateSignature(tx->sender, tx->hash, tx->sig) != true){
+                    return { BlockchainErrorType::SignatureMismatch, i, txIdx};
+                }
+                txIdx++;
             }
         }
     }
 
-    return 0;
+    return {BlockchainErrorType::None, -1};
 }
 
 float Blockchain::checkBalance(const std::string& address) {
