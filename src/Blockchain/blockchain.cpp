@@ -170,4 +170,51 @@ std::string Blockchain::validateWallet(const std::string & priv_key, const std::
     }
 }
 
+bool Blockchain::invalidateHash() {
+    if(blocks.size() == 0){
+        return false;
+    }
+    
+
+    for(int i=0; i<blocks.size(); ++i){
+        blocks[i]->hash = "badhash";
+    }
+
+    return true;
+
+}
+
+bool Blockchain::invalidateTxHash() {
+
+    //invalidate the transctions of all the blocks and check all blocks to make sure
+    if(blocks.size() == 0){
+        return false;
+    }
+
+
+    for(auto &b: blocks){
+        b->invalidateTxHash();
+        
+    }
+
+    return true;
+
+}
+
+bool Blockchain::invalidateTxSig()  {
+    if(blocks.size() == 0){
+        return false;
+    }
+
+
+
+    for(auto &b: blocks){
+        b->invalidateTxSig();
+    }
+
+    return true;
+    
+
+}
+
 

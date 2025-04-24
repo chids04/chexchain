@@ -34,19 +34,29 @@ namespace BlockchainAssignment {
 
         // Base64 decoding function
         std::vector<unsigned char> Wallet::base64_decode(const std::string& input) {
-            BIO *bio, *b64;
-            
-            std::vector<unsigned char> result(input.size());
-            
+            BIO *bio = nullptr, *b64 = nullptr;
+            std::vector<unsigned char> result;
+
+            // Quick check for empty or obviously invalid input
+            if (input.empty() || input == "null") {
+                return result;
+            }
+
+            result.resize(input.size());
+
             b64 = BIO_new(BIO_f_base64());
             bio = BIO_new_mem_buf(input.c_str(), input.length());
             bio = BIO_push(b64, bio);
-            
+
             BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL);
             int decoded_size = BIO_read(bio, result.data(), input.size());
-            
-            result.resize(decoded_size);
-            
+
+            if (decoded_size <= 0) {
+                result.clear();
+            } else {
+                result.resize(decoded_size);
+            }
+
             BIO_free_all(bio);
             return result;
         }
@@ -108,45 +118,37 @@ namespace BlockchainAssignment {
         }
 
         // Validates if a signature is legitimate
-        bool Wallet::ValidateSignature(std::string publicID, const std::string& datahash, 
-                                     const std::string& datasig) {
+        bool Wallet::ValidateSignature(std::string publicID, const std::string& datahash, const std::string& datasig) {
+            // Handle special case for mining rewards
             if (publicID == "Mine Rewards")
-                publicID = "QfF3+9GgTxyGLvb+ScOAI6nJxBh8IyZbeD0r6BJBMyabZmyuP82yrSLKMq/F05OG0VZ4gg63uHFZUKzCu3wZuA==";
-            
+                publicID = "BFlEn2Nq/7ux8k5WqYsPm7+OEJiwXtlJpDva1JXPqRHjafByB28DUF50Mz1FBTTG94Js2I2H3j3Z8//sr8KEp2E=";
+
             if (publicID.length() != 88 || datasig == "null") return false;
-            
+
             EVP_PKEY* pkey = createKey(publicID);
             if (!pkey) return false;
-            
+
             std::vector<unsigned char> datahash_bytes = base64_decode(datahash);
             std::vector<unsigned char> signature_bytes = base64_decode(datasig);
-            
-            EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
-            if (!mdctx) {
+
+            EVP_PKEY_CTX* ctx = EVP_PKEY_CTX_new(pkey, nullptr);
+            if (!ctx) {
+                EVP_PKEY_free(pkey);
+                return false;
+            }
+            if (EVP_PKEY_verify_init(ctx) <= 0) {
+                EVP_PKEY_CTX_free(ctx);
                 EVP_PKEY_free(pkey);
                 return false;
             }
 
-            if (EVP_DigestVerifyInit(mdctx, nullptr, nullptr, nullptr, pkey) != 1) {
-                EVP_MD_CTX_free(mdctx);
-                EVP_PKEY_free(pkey);
-                return false;
-            }
-
-            EVP_PKEY_CTX* pctx = EVP_MD_CTX_pkey_ctx(mdctx);
-            if (EVP_PKEY_CTX_set_signature_md(pctx, nullptr) <= 0) {
-                EVP_MD_CTX_free(mdctx);
-                EVP_PKEY_free(pkey);
-                return false;
-            }
-
-            int verify_result = EVP_DigestVerify(
-                mdctx, 
+            int verify_result = EVP_PKEY_verify(
+                ctx,
                 signature_bytes.data(), signature_bytes.size(),
                 datahash_bytes.data(), datahash_bytes.size()
             );
 
-            EVP_MD_CTX_free(mdctx);
+            EVP_PKEY_CTX_free(ctx);
             EVP_PKEY_free(pkey);
             return verify_result == 1;
         }

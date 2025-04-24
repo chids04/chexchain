@@ -19,7 +19,7 @@ class Blockchain{
 
 public:
 
-    enum class BlockchainErrorType{ None, HashMismatch, MerkleRootMismatch, SignatureMismatch };
+    enum class BlockchainErrorType{ None, NoBlocks, HashMismatch, MerkleRootMismatch, SignatureMismatch };
 
     struct BlockchainError{
         BlockchainErrorType type;
@@ -41,6 +41,15 @@ public:
 
     std::pair<std::string, std::string> generateWallet();
     std::string validateWallet(const std::string &priv_key, const std::string &pub_key);
+    
+
+    //testing functions
+
+    
+    
+    bool invalidateHash();
+    bool invalidateTxHash();
+    bool invalidateTxSig();
 
 
 private:

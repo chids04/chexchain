@@ -298,13 +298,10 @@ ApplicationWindow {
             topMargin: 10
             }
             
-            height: childrenRect.height
+            implicitHeight: 60
 
             RowLayout{
                 anchors.fill: parent
-
-
-
                 ColumnLayout{
                     Layout.fillHeight: true
 
@@ -381,6 +378,55 @@ ApplicationWindow {
             }
         }
 
-      
+        Item{
+            id: testing
+
+            anchors{
+                left: parent.left
+                rightMargin: 5
+                top: createTransaction.bottom
+                topMargin: 5
+                right: parent.right
+            }
+
+            height: childrenRect.height
+
+            Text{
+                id: testText
+                anchors{
+                    horizontalCenter: parent.horizontalCenter
+                    top: parent.top
+                }
+                color: "white"
+                text: "Testing Utilities (blockchain will be reset)"
+            }
+
+            RowLayout{
+
+                anchors{
+                    top: testText.bottom
+                    horizontalCenter: parent.horizontalCenter
+                    topMargin: 5
+                }
+
+                Button{
+                    text: "Invalidate Transaction\nSignatures"
+                    onClicked: BlockchainApp.invalidateTxSigs()
+                }
+
+                Button{
+                    text: "Invalidate Block\nHashes"
+                    onClicked: BlockchainApp.invalidateBlockHash()
+                }
+
+                Button{
+                    text: "Invalidate Transaction\nHashes"
+                    onClicked: BlockchainApp.invalidateTxHashes()
+
+                }
+            }
+            
+
+        }
     }
 }

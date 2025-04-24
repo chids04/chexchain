@@ -206,6 +206,18 @@ std::string Block::computeMerkleRoot(const std::vector<std::unique_ptr<Transacti
     return leaf_nodes[0];
 }
 
+void Block::invalidateTxHash() {
+    for(auto &tx : transactions){
+        tx->hash = "badhash";
+    }
+}
+
+void Block::invalidateTxSig() {
+    for(auto &tx: transactions){
+        tx->sig = "badsig";
+    }
+}
+
 
 
 

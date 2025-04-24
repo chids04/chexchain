@@ -1,4 +1,5 @@
 #include "blockchainapp.h"
+#include "blockchain.h"
 #include "wallet.h"
 #include <stdexcept>
 #include <string>
@@ -74,6 +75,38 @@ void BlockchainApp::printPendingTransactions()
     emit printMsg(QString::fromStdString(blockchain.printPendingTransactions()));
 }
 
+void BlockchainApp::invalidateTxSigs() {
+    bool success = blockchain.invalidateTxSig();
+
+    if(success){
+        emit printMsg("All transaction sigantures invalidated");
+    }
+    else{
+        emit printMsg("Failed to invalidate transcation signatures");
+    }
+}
+
+void BlockchainApp::invalidateBlockHash() {
+    bool success = blockchain.invalidateHash();
+    if(success){
+        emit printMsg("All block hashes were invalidated");
+    }
+    else{
+        emit printMsg("Failed to invalided all block hashes");
+    }
+}
+
+void BlockchainApp::invalidateTxHashes() {
+    bool success = blockchain.invalidateTxHash();
+
+    if(success){
+        emit printMsg("All transaction signatures were invalidated");
+    }
+    else{
+        emit printMsg("Failed to invalidate all transaction signatures");
+    }
+}
+
 void BlockchainApp::readAllBlocks()
 {
     emit printMsg(QString::fromStdString(blockchain.readAllBlocks()));
@@ -89,7 +122,7 @@ void BlockchainApp::generateBlock(const QString &miner_address)
 void BlockchainApp::validateBlockchain() {
     auto error = blockchain.validateBlockchain();
     if(error.type == Blockchain::BlockchainErrorType::None){
-        emit printMsg("All blocks are valid");
+        emit printMsg("All blocks and transactions are valid");
     }
     else{
         
@@ -99,6 +132,10 @@ void BlockchainApp::validateBlockchain() {
 
         else if(error.type == Blockchain::BlockchainErrorType::MerkleRootMismatch){
             emit printMsg("Merkle root mismatch at block index " + QString::number(error.blockIndex));
+        }
+
+        else if(error.type == Blockchain::BlockchainErrorType::SignatureMismatch){
+            emit printMsg(QString("Signature error in block at index %1 with transaction index %2").arg(error.blockIndex, error.txIndex));
         }
     }
 

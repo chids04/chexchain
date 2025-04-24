@@ -35,6 +35,11 @@ public slots:
     void validateTransaction();
     void printPendingTransactions();
 
+    //testing utils
+    void invalidateTxSigs();
+    void invalidateBlockHash();
+    void invalidateTxHashes();
+
 private:
     Blockchain blockchain;
     Transaction transaction;

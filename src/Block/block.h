@@ -35,6 +35,11 @@ public:
      */
     std::vector<std::pair<std::string, bool>> getMerkleProof(int index);
     static std::string computeMerkleRoot(const std::vector<std::unique_ptr<Transaction>> &transactions);
+
+    //testing functions
+    void invalidateTxHash();
+    void invalidateTxSig();
+
     
 
 
