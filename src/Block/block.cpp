@@ -6,7 +6,9 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <openssl/sha.h>
+#include <chrono>
+#include <print>
+#include <thread>
 
 using namespace BlockchainAssignment;
 
@@ -26,14 +28,14 @@ Block::Block(std::shared_ptr<Block> prev_block, std::string miner_address, std::
     );
 
     //can calculate block reward and being merkle root implementation
-
     for(const auto &tx: transactions){
         block_reward += tx->fee;
     }
 
     merkle_root = computeMerkleRoot(transactions);
 
-    mine();
+    //mine();
+    mineParallel(std::thread::hardware_concurrency());
 }
 
 
@@ -56,6 +58,7 @@ std::string Block::createHash()
 
 void Block::mine()
 {
+    auto start = std::chrono::high_resolution_clock::now();
     std::string zeros(DIFFICULTY_THRESHOLD, '0');
 
     hash = createHash();        
@@ -76,6 +79,50 @@ void Block::mine()
             isValid = true;
         }
     }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    std::println("Mining took {} seconds (single-threaded)", elapsed.count());
+}
+
+void Block::mineParallel(int numThreads) {
+    auto start = std::chrono::high_resolution_clock::now();
+    std::string zeros(DIFFICULTY_THRESHOLD, '0');
+    std::atomic<bool> found(false);
+    std::atomic<int> foundNonce(0);
+
+    // precompute static hash input
+    std::string baseInput = std::to_string(index) + std::to_string(timestamp) + merkle_root + prev_hash + std::to_string(block_reward);
+
+    auto worker = [&](int threadId, int batchSize) {
+        int nonceStart = threadId * batchSize;
+        int nonceEnd = nonceStart + batchSize;
+        for (int localNonce = nonceStart; localNonce < nonceEnd && !found; ++localNonce) {
+            std::string hashAttempt = HashCode::genSHA256(baseInput + std::to_string(localNonce));
+            if (hashAttempt.substr(0, DIFFICULTY_THRESHOLD) == zeros) {
+                if (!found.exchange(true)) {
+                    hash = hashAttempt;
+                    foundNonce = localNonce;
+                }
+                break;
+            }
+        }
+    };
+
+    std::vector<std::thread> threads;
+    int batchSize = 10000; 
+    std::println("Using {} threads", numThreads);
+    for (int i = 0; i < numThreads; ++i) {
+        threads.emplace_back(worker, i, batchSize);
+    }
+    for (auto& t : threads) {
+        t.join();
+    }
+
+    nonce = foundNonce;
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    std::println("Mining took {} seconds (multi-threaded)", elapsed.count());
 }
 
 std::string Block::getInfo()

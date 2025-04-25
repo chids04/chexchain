@@ -5,7 +5,7 @@
 
 #include "transaction.h"
 
-constexpr int DIFFICULTY_THRESHOLD = 4;
+constexpr int DIFFICULTY_THRESHOLD = 7;
 constexpr float MINE_REWARD = 50;
 
 class Block{
@@ -46,6 +46,7 @@ public:
 private:
     std::vector<std::unique_ptr<Transaction>> transactions;
     void mine();
+    void mineParallel(int numThreads);
 
     
 };
