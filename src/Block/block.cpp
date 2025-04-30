@@ -12,7 +12,10 @@
 
 using namespace BlockchainAssignment;
 
-Block::Block(std::shared_ptr<Block> prev_block, std::string miner_address, std::vector<std::unique_ptr<Transaction>> tx)
+Block::Block(std::shared_ptr<Block> prev_block, std::string miner_address, 
+    std::vector<std::unique_ptr<Transaction>> tx, unsigned int difficulty)
+     : difficulty(difficulty)
+
 {
     prev_hash = prev_block->hash;
     index = prev_block->index + 1;
@@ -35,7 +38,7 @@ Block::Block(std::shared_ptr<Block> prev_block, std::string miner_address, std::
     merkle_root = computeMerkleRoot(transactions);
 
     //mine();
-    mineParallel(std::thread::hardware_concurrency());
+    mineParallel(2);
 }
 
 
@@ -59,10 +62,10 @@ std::string Block::createHash()
 void Block::mine()
 {
     auto start = std::chrono::high_resolution_clock::now();
-    std::string zeros(DIFFICULTY_THRESHOLD, '0');
+    std::string zeros(difficulty, '0');
 
     hash = createHash();        
-    std::string hash_zeros = hash.substr(0, DIFFICULTY_THRESHOLD);
+    std::string hash_zeros = hash.substr(0, difficulty);
 
     if(hash_zeros == zeros){
         return;
@@ -73,7 +76,7 @@ void Block::mine()
     while(!isValid){
         nonce++;
         hash = createHash();
-        hash_zeros = hash.substr(0, DIFFICULTY_THRESHOLD);
+        hash_zeros = hash.substr(0, difficulty);
 
         if(hash_zeros == zeros){
             isValid = true;
@@ -87,7 +90,7 @@ void Block::mine()
 
 void Block::mineParallel(int numThreads) {
     auto start = std::chrono::high_resolution_clock::now();
-    std::string zeros(DIFFICULTY_THRESHOLD, '0');
+    std::string zeros(difficulty, '0');
     std::atomic<bool> found(false);
     std::atomic<int> foundNonce(0);
 
@@ -99,7 +102,7 @@ void Block::mineParallel(int numThreads) {
         int nonceEnd = nonceStart + batchSize;
         for (int localNonce = nonceStart; localNonce < nonceEnd && !found; ++localNonce) {
             std::string hashAttempt = HashCode::genSHA256(baseInput + std::to_string(localNonce));
-            if (hashAttempt.substr(0, DIFFICULTY_THRESHOLD) == zeros) {
+            if (hashAttempt.substr(0, difficulty) == zeros) {
                 if (!found.exchange(true)) {
                     hash = hashAttempt;
                     foundNonce = localNonce;
@@ -139,7 +142,7 @@ std::string Block::getInfo()
     else{
         msg =  "Block Index: " + std::to_string(index) + "\t\t" + "Timestamp: " + time_str + "\n" +
             "Hash: " + hash + "\n" + "Previous Hash: " + prev_hash +  "\nMerkle Root of Transactions: " + merkle_root + "\nNonce: " + std::to_string(nonce) + 
-            + "\nDifficulty: " + std::to_string(DIFFICULTY_THRESHOLD) + "\nMiner Address: " + transactions[0]->receiver + "\nTotal Block Reward: " + std::to_string(block_reward) +
+            + "\nDifficulty: " + std::to_string(difficulty) + "\nMiner Address: " + transactions[0]->receiver + "\nTotal Block Reward: " + std::to_string(block_reward) +
             "\nFees Recieved: " + std::to_string(std::max(block_reward-MINE_REWARD, MINE_REWARD))+ "\nTransactions: " + std::to_string(transactions.size()) + "\n\n" ;
     }
 
@@ -152,6 +155,10 @@ std::string Block::getInfo()
 
 const std::vector<std::unique_ptr<Transaction>>& Block::getTransactions() {
     return transactions;
+}
+
+std::vector<std::unique_ptr<Transaction>> Block::removeTransactions() {
+    return std::move(transactions);
 }
 
 std::vector<std::pair<std::string, bool>> Block::getMerkleProof(int txIndex) {

@@ -5,18 +5,20 @@
 
 #include "transaction.h"
 
-constexpr int DIFFICULTY_THRESHOLD = 7;
 constexpr float MINE_REWARD = 50;
 
 class Block{
 
 public:
-    Block(std::shared_ptr<Block> prev_block, std::string miner_address, std::vector<std::unique_ptr<Transaction>> tx);
+    Block(std::shared_ptr<Block> prev_block, std::string miner_address, 
+        std::vector<std::unique_ptr<Transaction>> tx, unsigned int difficulty);
+
     Block(); //genesis block
 
     long long timestamp;
     int index;
     int nonce = 0;
+    unsigned int difficulty;
     float block_reward = 0;
     std::string hash;
 
@@ -27,6 +29,7 @@ public:
     std::string merkle_root;
 
     const std::vector<std::unique_ptr<Transaction>>& getTransactions();
+    std::vector<std::unique_ptr<Transaction>> removeTransactions();
     
 
     /* gets the required sibling hashes needed to reconstruct the merkle root

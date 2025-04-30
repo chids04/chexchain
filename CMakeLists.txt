@@ -30,6 +30,8 @@ qt_add_executable(appblockchain
 
     src/Blockchain/blockchain.h
     src/Blockchain/blockchain.cpp
+    src/Blockchain/miner.h
+    
 
     src/Block/block.h
     src/Block/block.cpp

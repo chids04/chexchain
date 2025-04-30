@@ -5,6 +5,10 @@
 
 #include <vector>
 #include <memory>
+#include <mutex>
+#include <optional>
+#include <thread>
+
 
 
 constexpr int MAX_TRANSACTIONS = 5;
@@ -20,6 +24,7 @@ class Blockchain{
 public:
 
     enum class BlockchainErrorType{ None, NoBlocks, HashMismatch, MerkleRootMismatch, SignatureMismatch };
+    unsigned int BLOCK_DIFFICULTY_LEVEL = 4;
 
     struct BlockchainError{
         BlockchainErrorType type;
@@ -28,7 +33,15 @@ public:
     };
 
     Blockchain();
+    ~Blockchain();
+
+    void spawnMiners(int num);
+    std::vector<std::unique_ptr<Transaction>> getWork(unsigned maxTx);
+    void publishBlock(std::shared_ptr<Block> b);
+    int getDifficulty();
+
     void generateBlock(const std::string &miner_address);
+    std::optional<std::shared_ptr<Block>> getLastBlock();
     std::string readAllBlocks();
     std::string blockInfo(int index);
     BlockchainError validateBlockchain();
@@ -41,11 +54,10 @@ public:
 
     std::pair<std::string, std::string> generateWallet();
     std::string validateWallet(const std::string &priv_key, const std::string &pub_key);
-    
+
+
 
     //testing functions
-
-    
     
     bool invalidateHash();
     bool invalidateTxHash();
@@ -53,8 +65,16 @@ public:
 
 
 private:
+
+    mutable std::mutex txMutex_;
+    mutable std::mutex blockMutex_;
+    mutable std::mutex difficutlyMutex_;
+
     std::vector<std::shared_ptr<Block>> blocks;
     std::vector<std::unique_ptr<Transaction>> transactionPool;
+    std::vector<std::jthread> minerThreads;
+    std::stop_source minerStopSource;
+
+
 
 };
-
