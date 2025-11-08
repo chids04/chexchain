@@ -12,8 +12,8 @@
 
 using namespace BlockchainAssignment;
 
-Block::Block(std::shared_ptr<Block> prev_block, std::string miner_address, 
-    std::vector<std::unique_ptr<Transaction>> tx, unsigned int difficulty)
+Block::Block(std::shared_ptr<Block> prev_block, std::string miner_address,
+    std::vector<Transaction> tx, unsigned int difficulty)
      : difficulty(difficulty)
 
 {
@@ -21,18 +21,15 @@ Block::Block(std::shared_ptr<Block> prev_block, std::string miner_address,
     index = prev_block->index + 1;
     timestamp = Utility::genTimeStamp();
     hash = createHash();
-    auto mine_tx = std::make_unique<Transaction>("Mine Rewards", miner_address, "", block_reward + MINE_REWARD, 0);
-    transactions.push_back(std::move(mine_tx));
+    auto mine_tx = Transaction("Mine Rewards", miner_address, "", block_reward + MINE_REWARD, 0);
+    transactions.push_back(mine_tx);
 
-     transactions.insert(
-        transactions.end(),
-        std::make_move_iterator(tx.begin()),
-        std::make_move_iterator(tx.end())
-    );
+    ;
 
-    //can calculate block reward and being merkle root implementation
+    //can calculate block reward and insert into block
     for(const auto &tx: transactions){
-        block_reward += tx->fee;
+        block_reward += tx.fee;
+        transactions.push_back(tx);
     }
 
     merkle_root = computeMerkleRoot(transactions);
@@ -51,7 +48,7 @@ Block::Block()
 
 std::string Block::createHash()
 {
-    std::string input = std::to_string(index) + std::to_string(timestamp) + merkle_root + std::to_string(nonce) + 
+    std::string input = std::to_string(index) + std::to_string(timestamp) + merkle_root + std::to_string(nonce) +
         prev_hash + std::to_string(block_reward);
 
     std::string str_hash = HashCode::genSHA256(input);
@@ -64,7 +61,7 @@ void Block::mine()
     auto start = std::chrono::high_resolution_clock::now();
     std::string zeros(difficulty, '0');
 
-    hash = createHash();        
+    hash = createHash();
     std::string hash_zeros = hash.substr(0, difficulty);
 
     if(hash_zeros == zeros){
@@ -113,7 +110,7 @@ void Block::mineParallel(int numThreads) {
     };
 
     std::vector<std::thread> threads;
-    int batchSize = 10000; 
+    int batchSize = 10000;
     std::println("Using {} threads", numThreads);
     for (int i = 0; i < numThreads; ++i) {
         threads.emplace_back(worker, i, batchSize);
@@ -128,7 +125,7 @@ void Block::mineParallel(int numThreads) {
     std::println("Mining took {} seconds (multi-threaded)", elapsed.count());
 }
 
-std::string Block::getInfo()
+std::string Block::getInfo() const
 {
     //getting timestamp in readable format
     std::string time_str = Utility::printTime(timestamp);
@@ -141,82 +138,57 @@ std::string Block::getInfo()
 
     else{
         msg =  "Block Index: " + std::to_string(index) + "\t\t" + "Timestamp: " + time_str + "\n" +
-            "Hash: " + hash + "\n" + "Previous Hash: " + prev_hash +  "\nMerkle Root of Transactions: " + merkle_root + "\nNonce: " + std::to_string(nonce) + 
-            + "\nDifficulty: " + std::to_string(difficulty) + "\nMiner Address: " + transactions[0]->receiver + "\nTotal Block Reward: " + std::to_string(block_reward) +
+            "Hash: " + hash + "\n" + "Previous Hash: " + prev_hash +  "\nMerkle Root of Transactions: " + merkle_root + "\nNonce: " + std::to_string(nonce) +
+            + "\nDifficulty: " + std::to_string(difficulty) + "\nMiner Address: " + transactions[0].receiver + "\nTotal Block Reward: " + std::to_string(block_reward) +
             "\nFees Recieved: " + std::to_string(std::max(block_reward-MINE_REWARD, MINE_REWARD))+ "\nTransactions: " + std::to_string(transactions.size()) + "\n\n" ;
     }
 
     for(const auto &tx : transactions){
-        msg += tx->printTransaction() + "\n\n";
+        msg += tx.printTransaction() + "\n\n";
     }
 
     return msg;
 }
 
-const std::vector<std::unique_ptr<Transaction>>& Block::getTransactions() {
-    return transactions;
-}
-
-std::vector<std::unique_ptr<Transaction>> Block::removeTransactions() {
-    return std::move(transactions);
-}
 
 std::vector<std::pair<std::string, bool>> Block::getMerkleProof(int txIndex) {
-    std::vector<std::pair<std::string, bool>> proof;
-    std::vector<std::string> leaf_nodes;
+    std::vector<std::string> level;
 
-    //add leaf nodes (transaction hashes) to bottom of tree;
-    for(const auto &tx : transactions){
-        leaf_nodes.push_back(tx->hash);
+    // create with transaction hashes
+    for(const auto &tx : transactions) {
+        level.push_back(tx.hash);
     }
 
-    //now we combine and hash, duplicating last item if order number of nodes
-    while(leaf_nodes.size() > 1){
-        std::vector<std::string> parent_nodes;
-        for(int i=0; i<leaf_nodes.size(); i+=2){
-            std::string left = leaf_nodes[i];
-            std::string right;
-            
-            if(i+1 < leaf_nodes.size()){
-                right = leaf_nodes[i+1];
-            }
-            else{
-                right = left;
-            }
+    std::vector<std::pair<std::string, bool>> proof;
+    int currentIndex = txIndex;
 
-            //now we check if left or right is a sibling to the transaction we are verifying
-            if(i == txIndex || i+1 == txIndex){
-                if(txIndex % 2 == 0){
-                    /*
-                    target index is left (even indexes always left node in binary tree)
-                    so sibling is right
-                    bool set to false to indicate on right
-                    */
-                    proof.push_back({right, false});
-                }
-                else{
-                    //sibling is left, set bool to true to indicate this
-                    proof.push_back({left, true});
-                }
-                
-                txIndex = i / 2;
-            }
+    // build tree level by level, collecting proof as we go
+    while(level.size() > 1) {
+        // find sibling at this level
 
-            //we concat left right and hash to continue building tree, for next level
-            std::string hash = HashCode::CombineHash(left, right);
-            
-            parent_nodes.push_back(hash);
+        int siblingIndex = (currentIndex % 2 == 0) ? currentIndex + 1 : currentIndex - 1;
+
+        if(siblingIndex < level.size()) {
+            bool siblingIsLeft = (siblingIndex < currentIndex);
+            proof.push_back({level[siblingIndex], siblingIsLeft});
         }
 
-        //move onto next level
-        leaf_nodes=parent_nodes;
+        // build next level
+        std::vector<std::string> nextLevel;
+        for(int i = 0; i < level.size(); i += 2) {
+            std::string left = level[i];
+            std::string right = (i + 1 < level.size()) ? level[i + 1] : left;
+            nextLevel.push_back(HashCode::CombineHash(left, right));
+        }
+
+        level = nextLevel;
+        currentIndex = currentIndex / 2;  // Move to parent
     }
 
-    //proof contains ordered list of siblings for verification
     return proof;
 }
 
-std::string Block::computeMerkleRoot(const std::vector<std::unique_ptr<Transaction>> &transactions) {
+std::string Block::computeMerkleRoot(const std::vector<Transaction> &transactions) {
     std::vector<std::string> leaf_nodes;
 
     if(transactions.size() == 0){
@@ -225,7 +197,7 @@ std::string Block::computeMerkleRoot(const std::vector<std::unique_ptr<Transacti
 
     for(const auto &tx: transactions){
         //first add all hashes to an array
-        leaf_nodes.push_back(tx->hash);
+        leaf_nodes.push_back(tx.hash);
     }
 
     /*
@@ -234,9 +206,11 @@ std::string Block::computeMerkleRoot(const std::vector<std::unique_ptr<Transacti
     final remaining hash is the merkle root
     */
 
+    // i was thinking for really wide trees u could easily multi thread this or even use simd (i need to  leearn that)
+
     while(leaf_nodes.size() > 1){
         std::vector<std::string> parent_nodes;
-        
+
         for(int i=0; i<leaf_nodes.size(); i+=2){
             std::string left = leaf_nodes[i];
             std::string right;
@@ -262,16 +236,12 @@ std::string Block::computeMerkleRoot(const std::vector<std::unique_ptr<Transacti
 
 void Block::invalidateTxHash() {
     for(auto &tx : transactions){
-        tx->hash = "badhash";
+        tx.hash = "badhash";
     }
 }
 
 void Block::invalidateTxSig() {
     for(auto &tx: transactions){
-        tx->sig = "badsig";
+        tx.sig = "badsig";
     }
 }
-
-
-
-

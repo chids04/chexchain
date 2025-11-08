@@ -2,7 +2,7 @@
 #include "block.h"
 #include "wallet.h"
 #include "transaction.h"
-#include "miner.h"
+//#include "miner.h"
 
 #include <algorithm>
 #include <string>
@@ -25,7 +25,6 @@ Blockchain::Blockchain()
 
 Blockchain::~Blockchain()
 {
-    minerStopSource.request_stop();
 }
 
 void Blockchain::spawnMiners(int num) {
@@ -36,40 +35,47 @@ void Blockchain::spawnMiners(int num) {
         return;
     }
 
+    //std::thread worker_thread();
+
     //reset threads and stop source
-    minerStopSource.request_stop();
-    minerThreads.clear();
-    minerStopSource = {};
+    // minerStopSource.request_stop();
+    // minerThreads.clear();
+    // minerStopSource = {};
 
-    minerThreads.reserve(num);
+    // minerThreads.reserve(num);
 
-    for(int i=0; i<num; ++i){
-        minerThreads.emplace_back(
-            Miner{*this},
-            minerStopSource.get_token()
-        );
-    }
-
+    // for(int i=0; i<num; ++i){
+    //     minerThreads.emplace_back(
+    //         Miner{*this},
+    //         minerStopSource.get_token()
+    //     );
+    // }
 
 }
 
-std::vector<std::unique_ptr<Transaction>> Blockchain::getWork(unsigned maxTx)
+std::optional<std::vector<Transaction>> Blockchain::getWork(unsigned maxTx)
 {
     std::scoped_lock lk(txMutex_);
+    
+    //check if 
 
     unsigned n = std::min<unsigned>(transactionPool.size(), maxTx);
-    std::vector<std::unique_ptr<Transaction>> out;
+    std::vector<Transaction> out;
     out.reserve(n);
 
     for (unsigned i = 0; i < n; ++i) {
         std::pop_heap(transactionPool.begin(), transactionPool.end(),
                       TransactionComparator());            // highest-fee tx to back
-        out.push_back(std::move(transactionPool.back()));  // move, not copy
+
+        Transaction t = transactionPool.back();
+        out.push_back(t);  // copy for now, moving was giving me race conditions when multithreaading
         transactionPool.pop_back();
     }
 
     return out;
 }
+
+
 
 void Blockchain::publishBlock(std::shared_ptr<Block> b){
     std::scoped_lock lk(blockMutex_, txMutex_);
@@ -78,14 +84,7 @@ void Blockchain::publishBlock(std::shared_ptr<Block> b){
 
     if(b->prev_hash != prev->hash){
         //move transactions back into the mempool;
-        auto txs = b->removeTransactions();
-
-        //remove block reward transaction
-        if (!txs.empty()) {
-            txs.erase(txs.begin());
-        }
-
-        transactionPool.insert(transactionPool.end(), std::make_move_iterator(txs.begin()), std::make_move_iterator(txs.end()));
+        transactionPool.insert(transactionPool.end(), b->transactions.begin() + 1, b->transactions.end());
         std::push_heap(transactionPool.begin(), transactionPool.end(), TransactionComparator());
 
     }
@@ -105,12 +104,13 @@ int Blockchain::getDifficulty() {
 void Blockchain::generateBlock(const std::string &miner_address)
 {
     int x = std::min(static_cast<int>(transactionPool.size()), MAX_TRANSACTIONS);
-    std::vector<std::unique_ptr<Transaction>> to_process;
+    std::vector<Transaction> to_process;
 
     to_process.reserve(x);
 
     //move ownership of transaction to this temp array, which will then be moved to the block, moving better than copying
     //in c++ u can create virtual heap over the vector, so that i can efficiently sort transactions for miners to pick
+
     for(int i=0; i<x; ++i){
         std::pop_heap(transactionPool.begin(), transactionPool.end(), TransactionComparator());
         to_process.push_back(std::move(transactionPool.back()));
@@ -174,6 +174,7 @@ std::string Blockchain::blockInfo(int index)
 auto Blockchain::validateBlockchain() -> BlockchainError
 {
     std::scoped_lock lk(blockMutex_, txMutex_);
+
     for(int i=0; i<blocks.size(); i++){
         if(i == 0){
             continue;
@@ -184,8 +185,8 @@ auto Blockchain::validateBlockchain() -> BlockchainError
                 return { BlockchainErrorType::HashMismatch, i};
             }
 
-            //make sure the transactions make the same merkle root
-            const auto &transactions = blocks[i]->getTransactions();
+            // make sure the transactions make the same merkle root
+            const auto &transactions = blocks[i]->transactions;
             if(Block::computeMerkleRoot(transactions) != blocks[i]->merkle_root){
                 return { BlockchainErrorType::MerkleRootMismatch, i};
             }
@@ -193,7 +194,7 @@ auto Blockchain::validateBlockchain() -> BlockchainError
             //verify the signature for each of the transactions
             int txIdx = 0;
             for(const auto& tx: transactions){
-                if(Wallet::ValidateSignature(tx->sender, tx->hash, tx->sig) != true){
+                if(Wallet::ValidateSignature(tx.sender, tx.hash, tx.sig) != true){
                     return { BlockchainErrorType::SignatureMismatch, i, txIdx};
                 }
                 txIdx++;
@@ -211,23 +212,21 @@ float Blockchain::checkBalance(const std::string& address) {
     float bal = 0;
 
     for(const auto &pending_tx : transactionPool){
-        if(pending_tx->receiver == address){
-            bal += pending_tx->amount;
+        if(pending_tx.receiver == address){
+            bal += pending_tx.amount;
         }
-        else if(pending_tx->sender == address){
-            bal -= pending_tx->amount;
+        else if(pending_tx.sender == address){
+            bal -= pending_tx.amount;
         }
     }
 
     for(const auto &b: blocks){
-        const auto& transactions = b->getTransactions();
-
-        for(const auto &tx : transactions){
-            if(tx->receiver == address){
-                bal += tx->amount;
+        for(const auto &tx : b->transactions){
+            if(tx.receiver == address){
+                bal += tx.amount;
             }
-            else if(tx->sender == address){
-                bal -= tx->amount;
+            else if(tx.sender == address){
+                bal -= tx.amount;
             }
         }
     }
@@ -245,11 +244,11 @@ std::string Blockchain::createTransaction(const std::string &sender, const std::
         return "Sender has insufficient funds";
     }
 
-    auto transaction = std::make_unique<Transaction>(sender, receiver, privKey, amount, fee);
-    std::string log = transaction->printTransaction();
+    auto transaction = Transaction(sender, receiver, privKey, amount, fee);
+    std::string log = transaction.printTransaction();
 
     //unique pointers used for transactions, since they should 'belong' to the block that mines it
-    transactionPool.push_back(std::move(transaction));
+    transactionPool.push_back(transaction);
     std::push_heap(transactionPool.begin(), transactionPool.end(), TransactionComparator());
 
 
@@ -263,7 +262,7 @@ std::string Blockchain::printPendingTransactions()
     std::string msg = "Pending Transactions: " + std::to_string(transactionPool.size()) + "\n\n";
 
     for(const auto &tx : transactionPool){
-        msg += tx->printTransaction() + "\n\n";
+        msg += tx.printTransaction() + "\n\n";
     }
 
     return msg;

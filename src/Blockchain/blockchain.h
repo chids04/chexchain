@@ -9,13 +9,11 @@
 #include <optional>
 #include <thread>
 
-
-
 constexpr int MAX_TRANSACTIONS = 5;
 
 struct TransactionComparator {
-    bool operator()(const std::unique_ptr<Transaction>& a, const std::unique_ptr<Transaction>& b) const {
-        return a->fee < b->fee;
+    bool operator()(const Transaction& a, const Transaction& b) const {
+        return a.fee < b.fee;
     }
 };
 
@@ -36,7 +34,7 @@ public:
     ~Blockchain();
 
     void spawnMiners(int num);
-    std::vector<std::unique_ptr<Transaction>> getWork(unsigned maxTx);
+    std::vector<Transaction> getWork(unsigned maxTx);
     void publishBlock(std::shared_ptr<Block> b);
     int getDifficulty();
 
@@ -58,7 +56,7 @@ public:
 
 
     //testing functions
-    
+
     bool invalidateHash();
     bool invalidateTxHash();
     bool invalidateTxSig();
@@ -71,10 +69,7 @@ private:
     mutable std::mutex difficutlyMutex_;
 
     std::vector<std::shared_ptr<Block>> blocks;
-    std::vector<std::unique_ptr<Transaction>> transactionPool;
-    std::vector<std::jthread> minerThreads;
-    std::stop_source minerStopSource;
-
+    std::vector<Transaction> transactionPool;
 
 
 };

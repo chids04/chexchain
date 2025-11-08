@@ -5,14 +5,14 @@
 extern int nonce;
 
 class Transaction{
-    
+
 
 public:
     Transaction();
     Transaction(const std::string &sender, const std::string &receiver,
         const std::string &privKey, double amount, double fee);
 
-    std::string printTransaction();
+    std::string printTransaction() const;
 
     std::string hash;
     std::string sig;

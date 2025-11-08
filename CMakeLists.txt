@@ -15,7 +15,7 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(OpenSSL REQUIRED)
 
-qt_standard_project_setup(REQUIRES 6.10)
+qt_standard_project_setup()
 
 qt_add_executable(appblockchain
     src/main.cpp
@@ -29,7 +29,6 @@ qt_add_executable(appblockchain
     src/Blockchain/blockchain.h
     src/Blockchain/blockchain.cpp
     src/Blockchain/miner.h
-
 
     src/Block/block.h
     src/Block/block.cpp
