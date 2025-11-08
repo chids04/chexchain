@@ -17,11 +17,10 @@ using namespace BlockchainAssignment::Wallet;
 Blockchain::Blockchain()
 {
     blocks.push_back(std::make_shared<Block>());
-    spawnMiners(3);
-
+    //spawnMiners(3);
     //set up some miners here
 
-    
+
 }
 
 Blockchain::~Blockchain()
@@ -29,7 +28,7 @@ Blockchain::~Blockchain()
     minerStopSource.request_stop();
 }
 
-void Blockchain::spawnMiners(int num) { 
+void Blockchain::spawnMiners(int num) {
     //stop source allows us to send stop signal to all running threads (miners)
 
     if(num > std::thread::hardware_concurrency()){
@@ -43,7 +42,7 @@ void Blockchain::spawnMiners(int num) {
     minerStopSource = {};
 
     minerThreads.reserve(num);
-    
+
     for(int i=0; i<num; ++i){
         minerThreads.emplace_back(
             Miner{*this},
@@ -83,18 +82,18 @@ void Blockchain::publishBlock(std::shared_ptr<Block> b){
 
         //remove block reward transaction
         if (!txs.empty()) {
-            txs.erase(txs.begin()); 
+            txs.erase(txs.begin());
         }
 
         transactionPool.insert(transactionPool.end(), std::make_move_iterator(txs.begin()), std::make_move_iterator(txs.end()));
         std::push_heap(transactionPool.begin(), transactionPool.end(), TransactionComparator());
-        
+
     }
     else{
         std::println("New block with prev hash {} and hash {}", b->prev_hash, b->hash);
         blocks.push_back(std::move(b));
     }
-    
+
 }
 
 int Blockchain::getDifficulty() {
@@ -117,7 +116,7 @@ void Blockchain::generateBlock(const std::string &miner_address)
         to_process.push_back(std::move(transactionPool.back()));
         transactionPool.pop_back();
     }
-    
+
     //could expand this to take a weighted average of x amount of transactions
     auto start = std::chrono::high_resolution_clock::now();
     auto block = std::make_shared<Block>(blocks.back(), miner_address, std::move(to_process), BLOCK_DIFFICULTY_LEVEL);
@@ -190,7 +189,7 @@ auto Blockchain::validateBlockchain() -> BlockchainError
             if(Block::computeMerkleRoot(transactions) != blocks[i]->merkle_root){
                 return { BlockchainErrorType::MerkleRootMismatch, i};
             }
-            
+
             //verify the signature for each of the transactions
             int txIdx = 0;
             for(const auto& tx: transactions){
@@ -213,7 +212,7 @@ float Blockchain::checkBalance(const std::string& address) {
 
     for(const auto &pending_tx : transactionPool){
         if(pending_tx->receiver == address){
-            bal += pending_tx->amount;                     
+            bal += pending_tx->amount;
         }
         else if(pending_tx->sender == address){
             bal -= pending_tx->amount;
@@ -248,7 +247,7 @@ std::string Blockchain::createTransaction(const std::string &sender, const std::
 
     auto transaction = std::make_unique<Transaction>(sender, receiver, privKey, amount, fee);
     std::string log = transaction->printTransaction();
-    
+
     //unique pointers used for transactions, since they should 'belong' to the block that mines it
     transactionPool.push_back(std::move(transaction));
     std::push_heap(transactionPool.begin(), transactionPool.end(), TransactionComparator());
@@ -293,7 +292,7 @@ bool Blockchain::invalidateHash() {
     if(blocks.size() == 0){
         return false;
     }
-    
+
 
     for(int i=0; i<blocks.size(); ++i){
         blocks[i]->hash = "badhash";
@@ -313,7 +312,7 @@ bool Blockchain::invalidateTxHash() {
 
     for(auto &b: blocks){
         b->invalidateTxHash();
-        
+
     }
 
     return true;
@@ -333,8 +332,6 @@ bool Blockchain::invalidateTxSig()  {
     }
 
     return true;
-    
+
 
 }
-
-

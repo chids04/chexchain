@@ -6,8 +6,6 @@ elseif(APPLE)
     set(VCPKG_TARGET_TRIPLET arm64-osx)
 endif()
 
-include("$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
-
 project(blockchain VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -17,7 +15,7 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(OpenSSL REQUIRED)
 
-qt_standard_project_setup(REQUIRES 6.8)
+qt_standard_project_setup(REQUIRES 6.10)
 
 qt_add_executable(appblockchain
     src/main.cpp
@@ -31,7 +29,7 @@ qt_add_executable(appblockchain
     src/Blockchain/blockchain.h
     src/Blockchain/blockchain.cpp
     src/Blockchain/miner.h
-    
+
 
     src/Block/block.h
     src/Block/block.cpp
@@ -45,7 +43,7 @@ qt_add_qml_module(appblockchain
     VERSION 1.0
     QML_FILES
         ui/Main.qml
-    
+
     SOURCES
         src/BlockchainApp/blockchainapp.cpp
         src/BlockchainApp/blockchainapp.h
@@ -68,9 +66,9 @@ add_dependencies(appblockchain kill_appblockchain)
 
 
 
-target_include_directories(appblockchain PRIVATE 
+target_include_directories(appblockchain PRIVATE
     src
-    src/HashTools 
+    src/HashTools
     src/Wallet
     src/Blockchain
     src/Block
