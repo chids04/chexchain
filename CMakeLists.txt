@@ -12,8 +12,43 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
 
+
+
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(OpenSSL REQUIRED)
+
+add_library(blockchain_core STATIC
+    src/HashTools/hashtools.cpp
+    src/HashTools/hashtools.h
+
+    src/Wallet/wallet.cpp
+    src/Wallet/wallet.h
+
+    src/Blockchain/blockchain.h
+    src/Blockchain/blockchain.cpp
+    src/Blockchain/miner.h
+
+    src/Block/block.h
+    src/Block/block.cpp
+
+    src/Transaction/transaction.h
+    src/Transaction/transaction.cpp
+
+    src/Utility/utility.h
+)
+
+target_include_directories(blockchain_core PUBLIC
+    src
+    src/HashTools
+    src/Wallet
+    src/Blockchain
+    src/Block
+    src/Transaction
+    src/Utility
+)
+
+
+target_link_libraries(blockchain_core PUBLIC OpenSSL::SSL OpenSSL::Crypto)
 
 qt_standard_project_setup()
 
@@ -48,6 +83,8 @@ qt_add_qml_module(appblockchain
         src/BlockchainApp/blockchainapp.h
 )
 
+
+
 if(WIN32)
     add_custom_target(kill_appblockchain
         COMMAND taskkill /IM appblockchain.exe /F || exit 0
@@ -65,7 +102,7 @@ add_dependencies(appblockchain kill_appblockchain)
 
 
 
-target_include_directories(appblockchain PRIVATE
+target_include_directories(appblockchain PUBLIC
     src
     src/HashTools
     src/Wallet
@@ -74,7 +111,7 @@ target_include_directories(appblockchain PRIVATE
     src/BlockchainApp
     src/Transaction
     src/Utility)
-target_link_libraries(appblockchain PRIVATE Qt6::Quick OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(appblockchain PUBLIC Qt6::Quick OpenSSL::SSL OpenSSL::Crypto)
 
 include(GNUInstallDirs)
 install(TARGETS appblockchain
@@ -82,3 +119,8 @@ install(TARGETS appblockchain
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+option(BUILD_TESTS "build tests" OFF)
+if(BUILD_TESTS)
+    add_subdirectory(tests)
+endif()

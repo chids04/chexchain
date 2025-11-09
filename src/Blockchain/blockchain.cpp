@@ -56,8 +56,8 @@ void Blockchain::spawnMiners(int num) {
 std::optional<std::vector<Transaction>> Blockchain::getWork(unsigned maxTx)
 {
     std::scoped_lock lk(txMutex_);
-    
-    //check if 
+
+    //check if
 
     unsigned n = std::min<unsigned>(transactionPool.size(), maxTx);
     std::vector<Transaction> out;
@@ -83,7 +83,7 @@ void Blockchain::publishBlock(std::shared_ptr<Block> b){
     auto prev = blocks.back();
 
     if(b->prev_hash != prev->hash){
-        //move transactions back into the mempool;
+        // move transactions back into the mempool, +1 to skip coinbase reward at the beginning;
         transactionPool.insert(transactionPool.end(), b->transactions.begin() + 1, b->transactions.end());
         std::push_heap(transactionPool.begin(), transactionPool.end(), TransactionComparator());
 
@@ -100,7 +100,7 @@ int Blockchain::getDifficulty() {
     return BLOCK_DIFFICULTY_LEVEL;
 }
 
-//generates a blocks
+// generates a blocks
 void Blockchain::generateBlock(const std::string &miner_address)
 {
     int x = std::min(static_cast<int>(transactionPool.size()), MAX_TRANSACTIONS);

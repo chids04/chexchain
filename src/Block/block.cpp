@@ -165,8 +165,14 @@ std::vector<std::pair<std::string, bool>> Block::getMerkleProof(int txIndex) {
     // build tree level by level, collecting proof as we go
     while(level.size() > 1) {
         // find sibling at this level
-
-        int siblingIndex = (currentIndex % 2 == 0) ? currentIndex + 1 : currentIndex - 1;
+        //int siblingIndex = (currentIndex % 2 == 0) ? currentIndex + 1 : currentIndex - 1;
+        int siblingIndex;
+        if (currentIndex % 2 == 0) {
+            siblingIndex = currentIndex + 1;
+        }
+        else {
+            siblingIndex = currentIndex - 1;
+        }
 
         if(siblingIndex < level.size()) {
             bool siblingIsLeft = (siblingIndex < currentIndex);
