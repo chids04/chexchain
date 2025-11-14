@@ -100,8 +100,6 @@ endif()
 # Make the apphex-launcher target depend on the kill target
 add_dependencies(appblockchain kill_appblockchain)
 
-
-
 target_include_directories(appblockchain PUBLIC
     src
     src/HashTools
@@ -122,5 +120,6 @@ install(TARGETS appblockchain
 
 option(BUILD_TESTS "build tests" OFF)
 if(BUILD_TESTS)
+    enable_testing()
     add_subdirectory(tests)
 endif()

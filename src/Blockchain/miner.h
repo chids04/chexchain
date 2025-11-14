@@ -8,9 +8,8 @@
 #include <stop_token>
 #include <print>
 
-using namespace BlockchainAssignment::Wallet;
 
-struct KeyPair{
+struct pkey{
     std::string pub_key;
     std::string priv_key;
 };
@@ -51,7 +50,7 @@ public:
     // }
 
 private:
-    KeyPair keys;
+    pkey keys;
     unsigned    id_;
     Blockchain& chain_;
     std::string payout_;

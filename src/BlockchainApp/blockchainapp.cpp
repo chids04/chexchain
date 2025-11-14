@@ -5,7 +5,6 @@
 #include <string>
 
 
-using namespace BlockchainAssignment::Wallet;
 
 void BlockchainApp::init()
 {
@@ -14,7 +13,7 @@ void BlockchainApp::init()
 
 void BlockchainApp::getBlockInfo(int index){
     std::string blockInfo = blockchain.blockInfo(index);
-    
+
     emit printMsg(QString::fromStdString(blockInfo));
 }
 
@@ -35,7 +34,7 @@ void BlockchainApp::validateWallet(const QString &priv, const QString &pub)
 }
 
 void BlockchainApp::checkBalance(const QString &address) {
-    
+
     float bal = blockchain.checkBalance(address.toStdString());
 
     emit printMsg("Wallet balance is " + QString::fromStdString(std::to_string(bal)));
@@ -55,7 +54,7 @@ void BlockchainApp::createTransaction(const QString &sender, const QString &priv
     catch(const std::runtime_error &ex){
         emit printMsg(QString::fromStdString(ex.what()));
     }
-    
+
 }
 
 void BlockchainApp::validateTransaction()
@@ -125,7 +124,7 @@ void BlockchainApp::validateBlockchain() {
         emit printMsg("All blocks and transactions are valid");
     }
     else{
-        
+
         if(error.type == Blockchain::BlockchainErrorType::HashMismatch){
             emit printMsg("Hash mismatch at block index " + QString::number(error.blockIndex));
         }
@@ -139,5 +138,5 @@ void BlockchainApp::validateBlockchain() {
         }
     }
 
-    
+
 }

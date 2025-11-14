@@ -34,7 +34,7 @@ public:
     ~Blockchain();
 
     void spawnMiners(int num);
-    std::vector<Transaction> getWork(unsigned maxTx);
+    std::optional<std::vector<Transaction>> getWork(unsigned maxTx);
     void publishBlock(std::shared_ptr<Block> b);
     int getDifficulty();
 

@@ -11,7 +11,6 @@
 #include <print>
 #include <mutex>
 
-using namespace BlockchainAssignment::Wallet;
 
 //generates the genesis block
 Blockchain::Blockchain()
